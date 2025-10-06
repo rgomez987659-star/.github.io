@@ -30,22 +30,11 @@
         ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         .modal.hidden .modal-content { transform: scale(0.95); opacity: 0; }
         .modal .modal-content { transition: all 0.2s ease-in-out; }
-
-        /* Auth visibility */
-        .logged-out .auth-required, .logged-out .user-info { display: none !important; }
-        .logged-in .login-prompt { display: none !important; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 logged-out">
+<body class="bg-slate-100 text-slate-800">
 
     <div id="app" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
-        
-        <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex justify-center items-center z-50">
-            <div class="text-center">
-                <i class="fas fa-spinner fa-spin text-4xl text-indigo-600"></i>
-                <p class="mt-4 text-slate-700">Iniciando aplicación...</p>
-            </div>
-        </div>
 
         <!-- Header -->
         <header class="mb-8 flex justify-between items-center">
@@ -55,162 +44,148 @@
                 </button>
                 <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">JustPersonal</h1>
             </div>
-             <div class="flex items-center gap-4">
-                <div class="user-info text-right">
-                    <p id="user-greeting" class="text-sm font-semibold text-slate-700"></p>
-                    <p id="user-email" class="text-xs text-slate-500"></p>
-                </div>
-                <button id="sign-out-btn" class="user-info bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Salir</button>
-             </div>
+            <p id="current-date" class="text-sm text-slate-500 font-medium"></p>
         </header>
 
-        <!-- Login Prompt -->
-        <div id="login-view" class="login-prompt text-center bg-white p-8 rounded-xl shadow-lg">
-            <i class="fas fa-lock text-4xl text-indigo-500 mb-4"></i>
-            <h2 class="text-2xl font-bold mb-2">Bienvenido a JustPersonal</h2>
-            <p class="text-slate-600 mb-6">Inicia sesión con tu cuenta de Google para guardar tus datos de forma segura en la nube y acceder a ellos desde cualquier dispositivo.</p>
-            <button id="sign-in-btn" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-3 mx-auto">
-                <i class="fab fa-google"></i> Iniciar Sesión con Google
-            </button>
-        </div>
-
-        <div class="auth-required">
-            <!-- VISTA PRINCIPAL: MENÚ -->
-            <div id="home-view" class="view active">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <button data-view="finance-view" class="menu-btn group bg-gradient-to-br from-indigo-500 to-blue-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
-                        <i class="fas fa-chart-pie text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                        <h2 class="text-xl font-bold">Temas Financieros</h2>
-                        <p class="text-sm opacity-80">Controla tus gastos, ingresos e inversiones.</p>
-                    </button>
-                    <button data-view="health-view" class="menu-btn group bg-gradient-to-br from-green-500 to-emerald-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
-                        <i class="fas fa-heart-pulse text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                        <h2 class="text-xl font-bold">Temas de Salud</h2>
-                        <p class="text-sm opacity-80">Gestiona citas, recordatorios y bienestar.</p>
-                    </button>
-                    <button data-view="social-view" class="menu-btn group bg-gradient-to-br from-sky-500 to-cyan-400 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
-                        <i class="fas fa-share-nodes text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                        <h2 class="text-xl font-bold">Redes Sociales</h2>
-                        <p class="text-sm opacity-80">Accede a tus perfiles rápidamente.</p>
-                    </button>
-                    <button data-view="ai-view" class="menu-btn group bg-gradient-to-br from-purple-600 to-violet-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
-                        <i class="fas fa-brain text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                        <h2 class="text-xl font-bold">Asistente de Relaciones</h2>
-                        <p class="text-sm opacity-80">Obtén una perspectiva sobre tu relación.</p>
-                    </button>
-                </div>
+        <!-- VISTA PRINCIPAL: MENÚ -->
+        <div id="home-view" class="view active">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <button data-view="finance-view" class="menu-btn group bg-gradient-to-br from-indigo-500 to-blue-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
+                    <i class="fas fa-chart-pie text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    <h2 class="text-xl font-bold">Temas Financieros</h2>
+                    <p class="text-sm opacity-80">Controla tus gastos, ingresos e inversiones.</p>
+                </button>
+                <button data-view="health-view" class="menu-btn group bg-gradient-to-br from-green-500 to-emerald-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
+                    <i class="fas fa-heart-pulse text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    <h2 class="text-xl font-bold">Temas de Salud</h2>
+                    <p class="text-sm opacity-80">Gestiona citas, recordatorios y bienestar.</p>
+                </button>
+                <button data-view="social-view" class="menu-btn group bg-gradient-to-br from-sky-500 to-cyan-400 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
+                    <i class="fas fa-share-nodes text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    <h2 class="text-xl font-bold">Redes Sociales</h2>
+                    <p class="text-sm opacity-80">Accede a tus perfiles rápidamente.</p>
+                </button>
+                <button data-view="ai-view" class="menu-btn group bg-gradient-to-br from-purple-600 to-violet-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
+                    <i class="fas fa-brain text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                    <h2 class="text-xl font-bold">Asistente de Relaciones</h2>
+                    <p class="text-sm opacity-80">Obtén una perspectiva sobre tu relación.</p>
+                </button>
             </div>
-            
-            <!-- VISTA: FINANZAS -->
-            <div id="finance-view" class="view">
-                <div class="flex justify-between items-center mb-6">
-                     <h2 class="text-2xl font-bold">Finanzas Personales</h2>
+        </div>
+        
+        <!-- VISTA: FINANZAS -->
+        <div id="finance-view" class="view">
+            <div class="flex justify-between items-center mb-6">
+                 <h2 class="text-2xl font-bold">Finanzas Personales</h2>
+            </div>
+           
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Columna: Pagos de Servicios -->
+                <div class="lg:col-span-1 bg-white p-5 rounded-lg shadow-lg">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold">Pago de Servicios</h3>
+                        <button id="add-service-btn" class="bg-blue-100 text-blue-600 hover:bg-blue-200 transition rounded-full w-8 h-8 flex items-center justify-center">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div id="services-list" class="space-y-3"></div>
                 </div>
-               
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 bg-white p-5 rounded-lg shadow-lg">
+
+                <!-- Columna: Ingresos y Gastos -->
+                <div class="lg:col-span-2 space-y-6">
+                     <div class="bg-white p-5 rounded-lg shadow-lg">
                         <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold">Pago de Servicios</h3>
-                            <button id="add-service-btn" class="bg-blue-100 text-blue-600 hover:bg-blue-200 transition rounded-full w-8 h-8 flex items-center justify-center">
+                            <h3 class="text-lg font-bold">Ingresos</h3>
+                            <button id="add-income-btn" class="bg-green-100 text-green-600 hover:bg-green-200 transition rounded-full w-8 h-8 flex items-center justify-center">
                                 <i class="fas fa-plus"></i>
                             </button>
                         </div>
-                        <div id="services-list" class="space-y-3"></div>
+                        <div id="income-list" class="space-y-4"></div>
                     </div>
-                    <div class="lg:col-span-2 space-y-6">
-                         <div class="bg-white p-5 rounded-lg shadow-lg">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-bold">Ingresos</h3>
-                                <button id="add-income-btn" class="bg-green-100 text-green-600 hover:bg-green-200 transition rounded-full w-8 h-8 flex items-center justify-center">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                            <div id="income-list" class="space-y-4"></div>
+                     <div class="bg-white p-5 rounded-lg shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold">Gastos</h3>
+                            <button id="add-expense-btn" class="bg-red-100 text-red-600 hover:bg-red-200 transition rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-plus"></i>
+                            </button>
                         </div>
-                         <div class="bg-white p-5 rounded-lg shadow-lg">
-                            <div class="flex justify-between items-center mb-4">
-                                <h3 class="text-lg font-bold">Gastos</h3>
-                                <button id="add-expense-btn" class="bg-red-100 text-red-600 hover:bg-red-200 transition rounded-full w-8 h-8 flex items-center justify-center">
-                                    <i class="fas fa-plus"></i>
-                                </button>
-                            </div>
-                            <div id="expense-list" class="space-y-4"></div>
-                        </div>
+                        <div id="expense-list" class="space-y-4"></div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- VISTA: SALUD -->
-            <div id="health-view" class="view">
-                <h2 class="text-2xl font-bold mb-4">Salud</h2>
-                 <p class="text-center text-slate-500 mt-10">Módulo en construcción.</p>
+
+        <!-- VISTA: SALUD -->
+        <div id="health-view" class="view">
+            <h2 class="text-2xl font-bold mb-4">Salud</h2>
+             <p class="text-center text-slate-500 mt-10">Módulo en construcción.</p>
+        </div>
+
+        <!-- VISTA: REDES SOCIALES -->
+        <div id="social-view" class="view">
+            <h2 class="text-2xl font-bold mb-6">Redes Sociales</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                <a href="https://facebook.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                    <i class="fab fa-facebook text-2xl text-blue-600"></i> <span class="font-semibold">Facebook</span>
+                </a>
+                <a href="https://instagram.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                    <i class="fab fa-instagram text-2xl text-pink-600"></i> <span class="font-semibold">Instagram</span>
+                </a>
+                <a href="https://x.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                    <i class="fab fa-twitter text-2xl text-sky-500"></i> <span class="font-semibold">X (Twitter)</span>
+                </a>
+                <a href="https://linkedin.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                    <i class="fab fa-linkedin text-2xl text-blue-700"></i> <span class="font-semibold">LinkedIn</span>
+                </a>
+                 <a href="https://tiktok.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                    <i class="fab fa-tiktok text-2xl text-black"></i> <span class="font-semibold">TikTok</span>
+                </a>
+                 <a href="https://youtube.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                    <i class="fab fa-youtube text-2xl text-red-600"></i> <span class="font-semibold">YouTube</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- VISTA: ASISTENTE IA -->
+        <div id="ai-view" class="view">
+            <div id="ai-intro">
+                <h2 class="text-2xl font-bold mb-2">Asistente de Relaciones</h2>
+                <p class="text-slate-600 mb-6">Presiona el botón para que la IA genere un cuestionario único y divertido sobre tu relación. Tus respuestas son privadas y no se guardan.</p>
+                <button id="start-ai-test-btn" class="w-full bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-purple-700 transition duration-300 flex items-center justify-center gap-2">
+                    <i class="fas fa-magic"></i> Generar Cuestionario
+                </button>
             </div>
 
-            <!-- VISTA: REDES SOCIALES -->
-            <div id="social-view" class="view">
-                <h2 class="text-2xl font-bold mb-6">Redes Sociales</h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    <a href="https://facebook.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                        <i class="fab fa-facebook text-2xl text-blue-600"></i> <span class="font-semibold">Facebook</span>
-                    </a>
-                    <a href="https://instagram.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                        <i class="fab fa-instagram text-2xl text-pink-600"></i> <span class="font-semibold">Instagram</span>
-                    </a>
-                    <a href="https://x.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                        <i class="fab fa-twitter text-2xl text-sky-500"></i> <span class="font-semibold">X (Twitter)</span>
-                    </a>
-                    <a href="https://linkedin.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                        <i class="fab fa-linkedin text-2xl text-blue-700"></i> <span class="font-semibold">LinkedIn</span>
-                    </a>
-                     <a href="https://tiktok.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                        <i class="fab fa-tiktok text-2xl text-black"></i> <span class="font-semibold">TikTok</span>
-                    </a>
-                     <a href="https://youtube.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                        <i class="fab fa-youtube text-2xl text-red-600"></i> <span class="font-semibold">YouTube</span>
-                    </a>
+            <div id="ai-test" class="hidden">
+                <div class="mb-6">
+                    <div class="w-full bg-slate-200 rounded-full h-2.5">
+                        <div id="progress-bar" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="progress-label" class="text-center text-sm text-slate-500 mt-2"></p>
+                </div>
+                <div id="question-container" class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 id="question-title" class="text-lg font-semibold mb-4"></h3>
+                    <textarea id="question-answer" rows="4" class="w-full p-3 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                    <div class="flex justify-between items-center mt-4">
+                        <button id="prev-question-btn" class="bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Anterior</button>
+                        <button id="next-question-btn" class="bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition">Siguiente</button>
+                    </div>
+                </div>
+                <div id="user-final-question-container" class="hidden mt-6">
+                     <h3 class="text-lg font-semibold mb-4 text-center">Finalmente, ¿qué pregunta del corazón le hacemos al asistente?</h3>
+                     <input type="text" id="user-final-question" placeholder="Ej: ¿Somos el uno para el otro? / ¿Nuestra locura combina?" class="w-full p-3 text-center border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                     <button id="get-ai-response-btn" class="mt-4 w-full bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300">¡Consultar al Oráculo del Amor!</button>
                 </div>
             </div>
 
-            <!-- VISTA: ASISTENTE IA -->
-            <div id="ai-view" class="view">
-                <div id="ai-intro">
-                    <h2 class="text-2xl font-bold mb-2">Asistente de Relaciones</h2>
-                    <p class="text-slate-600 mb-6">Presiona el botón para que la IA genere un cuestionario único y divertido sobre tu relación. Tus respuestas son privadas y no se guardan.</p>
-                    <button id="start-ai-test-btn" class="w-full bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-purple-700 transition duration-300 flex items-center justify-center gap-2">
-                        <i class="fas fa-magic"></i> Generar Cuestionario
-                    </button>
+            <div id="ai-result" class="hidden">
+                <h2 class="text-2xl font-bold mb-4">Perspectiva del Asistente</h2>
+                <div id="ai-response-container" class="bg-white p-6 rounded-lg shadow-lg space-y-4 text-slate-700">
+                    <!-- AI response goes here -->
                 </div>
-
-                <div id="ai-test" class="hidden">
-                    <div class="mb-6">
-                        <div class="w-full bg-slate-200 rounded-full h-2.5">
-                            <div id="progress-bar" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
-                        </div>
-                        <p id="progress-label" class="text-center text-sm text-slate-500 mt-2"></p>
-                    </div>
-                    <div id="question-container" class="bg-white p-6 rounded-lg shadow-lg">
-                        <h3 id="question-title" class="text-lg font-semibold mb-4"></h3>
-                        <textarea id="question-answer" rows="4" class="w-full p-3 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
-                        <div class="flex justify-between items-center mt-4">
-                            <button id="prev-question-btn" class="bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Anterior</button>
-                            <button id="next-question-btn" class="bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition">Siguiente</button>
-                        </div>
-                    </div>
-                    <div id="user-final-question-container" class="hidden mt-6">
-                         <h3 class="text-lg font-semibold mb-4 text-center">Finalmente, ¿qué pregunta del corazón le hacemos al asistente?</h3>
-                         <input type="text" id="user-final-question" placeholder="Ej: ¿Somos el uno para el otro? / ¿Nuestra locura combina?" class="w-full p-3 text-center border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                         <button id="get-ai-response-btn" class="mt-4 w-full bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300">¡Consultar al Oráculo del Amor!</button>
-                    </div>
-                </div>
-
-                <div id="ai-result" class="hidden">
-                    <h2 class="text-2xl font-bold mb-4">Perspectiva del Asistente</h2>
-                    <div id="ai-response-container" class="bg-white p-6 rounded-lg shadow-lg space-y-4 text-slate-700">
-                        <!-- AI response goes here -->
-                    </div>
-                     <p class="text-xs text-slate-400 mt-4 text-center italic">Aviso: El asistente es muy simpático, pero esto no reemplaza el consejo de un profesional. Tómalo con humor y cariño.</p>
-                    <button id="ai-reset-btn" class="mt-6 w-full bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Hacer otro análisis</button>
-                </div>
+                 <p class="text-xs text-slate-400 mt-4 text-center italic">Aviso: El asistente es muy simpático, pero esto no reemplaza el consejo de un profesional. Tómalo con humor y cariño.</p>
+                <button id="ai-reset-btn" class="mt-6 w-full bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Hacer otro análisis</button>
             </div>
         </div>
 
@@ -281,99 +256,33 @@
     </div>
 
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-        // --- PASO 1: AGREGA TU CONFIGURACIÓN DE FIREBASE AQUÍ ---
-        const firebaseConfig = {
-            apiKey: "AIzaSyAWiS_w03U8f_XBGdCRANIt-LyAIUtN2tM",
-            authDomain: "mis-propiedades-d3d58.firebaseapp.com",
-            projectId: "mis-propiedades-d3d58",
-            storageBucket: "mis-propiedades-d3d58.firebasestorage.app",
-            messagingSenderId: "864318821585",
-            appId: "1:864318821585:web:9cbc0c572de67afd1161f0",
-            measurementId: "G-H4MYL95714"
-        };
-
-        // --- PASO 2: AGREGA TU API KEY DE GOOGLE AI STUDIO AQUÍ ---
+        // --- AGREGA TU API KEY DE GOOGLE AI STUDIO AQUÍ ---
         const GEMINI_API_KEY = "AIzaSyBLhjMoZVyn3MjRgckcmW9Vavf9bR9Yx70";
-
-        // --- INICIALIZACIÓN ---
-        let app;
-        try {
-            app = initializeApp(firebaseConfig);
-        } catch (e) {
-            document.getElementById('loading-overlay').innerHTML = `<div class="text-center p-4"><h3 class="text-xl font-bold text-red-600">Configuración Requerida</h3><p class="mt-2 text-slate-700">Debes agregar tu objeto 'firebaseConfig' en el archivo HTML para conectar la aplicación.</p></div>`;
-            console.error("Firebase initialization failed:", e);
-            return;
-        }
-
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-        const provider = new GoogleAuthProvider();
 
         const views = document.querySelectorAll('.view');
         const menuButtons = document.querySelectorAll('.menu-btn');
         const backButton = document.getElementById('back-to-home');
         const currentDateEl = document.getElementById('current-date');
-        const body = document.body;
 
         // State
         let currentView = 'home-view';
-        let currentUser = null;
-        let financeData = { services: [], incomes: [], expenses: [] };
-
-        // --- AUTHENTICATION ---
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                body.classList.remove('logged-out');
-                body.classList.add('logged-in');
-                document.getElementById('user-greeting').textContent = `Hola, ${user.displayName.split(' ')[0]}`;
-                document.getElementById('user-email').textContent = user.email;
-                
-                await loadDataFromFirestore();
-                navigateTo('home-view');
-            } else {
-                currentUser = null;
-                body.classList.remove('logged-in');
-                body.classList.add('logged-out');
-                financeData = { services: [], incomes: [], expenses: [] };
-            }
-             document.getElementById('loading-overlay').style.display = 'none';
-        });
-        
-        const signIn = () => signInWithPopup(auth, provider).catch(e => console.error(e));
-        const logOut = () => signOut(auth).catch(e => console.error(e));
-
-        document.getElementById('sign-in-btn').addEventListener('click', signIn);
-        document.getElementById('sign-out-btn').addEventListener('click', logOut);
-        
-
-        // --- DATA PERSISTENCE (FIRESTORE) ---
-        const saveDataToFirestore = async () => {
-            if (!currentUser) return;
-            const userDocRef = doc(db, 'users', currentUser.uid);
-            try {
-                await setDoc(userDocRef, { finance: financeData }, { merge: true });
-            } catch (error) {
-                console.error("Error saving data: ", error);
-            }
+        let financeData = {
+            services: [],
+            incomes: [],
+            expenses: []
         };
-        const loadDataFromFirestore = async () => {
-            if (!currentUser) return;
-            const userDocRef = doc(db, 'users', currentUser.uid);
-            try {
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists() && docSnap.data().finance) {
-                    financeData = docSnap.data().finance;
-                } else {
-                    financeData = { services: [], incomes: [], expenses: [] };
-                }
-            } catch (error) {
-                 console.error("Error loading data: ", error);
+
+        // --- DATA PERSISTENCE (LocalStorage) ---
+        const saveData = () => {
+            localStorage.setItem('justPersonalFinance', JSON.stringify(financeData));
+        };
+        const loadData = () => {
+            const data = localStorage.getItem('justPersonalFinance');
+            if(data) {
+                financeData = JSON.parse(data);
             }
         };
 
@@ -465,7 +374,7 @@
                 url: document.getElementById('service-url').value,
                 ref: document.getElementById('service-ref').value
             });
-            saveDataToFirestore();
+            saveData();
             renderServices();
             closeModal(serviceModal);
             e.target.reset();
@@ -475,7 +384,7 @@
             if(e.target.closest('.delete-service-btn')) {
                 const index = e.target.closest('.delete-service-btn').dataset.index;
                 financeData.services.splice(index, 1);
-                saveDataToFirestore();
+                saveData();
                 renderServices();
             }
         });
@@ -518,7 +427,7 @@
                 if (!financeData.expenses) financeData.expenses = [];
                 financeData.expenses.push(transaction);
             }
-            saveDataToFirestore();
+            saveData();
             renderTransactions(type === 'income' ? 'incomes' : 'expenses', type === 'income' ? 'income-list' : 'expense-list');
             closeModal(transactionModal);
         });
@@ -730,6 +639,9 @@
         getAiResponseBtn.addEventListener('click', getAiResponse);
         aiResetBtn.addEventListener('click', resetAi);
 
+        // --- Initial Load ---
+        document.getElementById('loading-overlay').style.display = 'none';
+        loadData();
     });
     </script>
 </body>
