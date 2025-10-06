@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JustPersonal - Asistente Personal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .view {
+            display: none;
+        }
+        .view.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .modal.hidden .modal-content { transform: scale(0.95); opacity: 0; }
+        .modal .modal-content { transition: all 0.2s ease-in-out; }
+
+        /* Auth visibility */
+        .logged-out .auth-required, .logged-out .user-info { display: none !important; }
+        .logged-in .login-prompt { display: none !important; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 logged-out">
+
+    <div id="app" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
+        
+        <div id="loading-overlay" class="fixed inset-0 bg-white/80 backdrop-blur-sm flex justify-center items-center z-50">
+            <div class="text-center">
+                <i class="fas fa-spinner fa-spin text-4xl text-indigo-600"></i>
+                <p class="mt-4 text-slate-700">Iniciando aplicación...</p>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="mb-8 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <button id="back-to-home" class="hidden bg-white text-slate-600 w-10 h-10 rounded-full flex items-center justify-center shadow-sm border border-slate-200 hover:bg-slate-50 transition">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">JustPersonal</h1>
+            </div>
+             <div class="flex items-center gap-4">
+                <div class="user-info text-right">
+                    <p id="user-greeting" class="text-sm font-semibold text-slate-700"></p>
+                    <p id="user-email" class="text-xs text-slate-500"></p>
+                </div>
+                <button id="sign-out-btn" class="user-info bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Salir</button>
+             </div>
+        </header>
+
+        <!-- Login Prompt -->
+        <div id="login-view" class="login-prompt text-center bg-white p-8 rounded-xl shadow-lg">
+            <i class="fas fa-lock text-4xl text-indigo-500 mb-4"></i>
+            <h2 class="text-2xl font-bold mb-2">Bienvenido a JustPersonal</h2>
+            <p class="text-slate-600 mb-6">Inicia sesión con tu cuenta de Google para guardar tus datos de forma segura en la nube y acceder a ellos desde cualquier dispositivo.</p>
+            <button id="sign-in-btn" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition duration-300 flex items-center justify-center gap-3 mx-auto">
+                <i class="fab fa-google"></i> Iniciar Sesión con Google
+            </button>
+        </div>
+
+        <div class="auth-required">
+            <!-- VISTA PRINCIPAL: MENÚ -->
+            <div id="home-view" class="view active">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <button data-view="finance-view" class="menu-btn group bg-gradient-to-br from-indigo-500 to-blue-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
+                        <i class="fas fa-chart-pie text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                        <h2 class="text-xl font-bold">Temas Financieros</h2>
+                        <p class="text-sm opacity-80">Controla tus gastos, ingresos e inversiones.</p>
+                    </button>
+                    <button data-view="health-view" class="menu-btn group bg-gradient-to-br from-green-500 to-emerald-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
+                        <i class="fas fa-heart-pulse text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                        <h2 class="text-xl font-bold">Temas de Salud</h2>
+                        <p class="text-sm opacity-80">Gestiona citas, recordatorios y bienestar.</p>
+                    </button>
+                    <button data-view="social-view" class="menu-btn group bg-gradient-to-br from-sky-500 to-cyan-400 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
+                        <i class="fas fa-share-nodes text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                        <h2 class="text-xl font-bold">Redes Sociales</h2>
+                        <p class="text-sm opacity-80">Accede a tus perfiles rápidamente.</p>
+                    </button>
+                    <button data-view="ai-view" class="menu-btn group bg-gradient-to-br from-purple-600 to-violet-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
+                        <i class="fas fa-brain text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
+                        <h2 class="text-xl font-bold">Asistente de Relaciones</h2>
+                        <p class="text-sm opacity-80">Obtén una perspectiva sobre tu relación.</p>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- VISTA: FINANZAS -->
+            <div id="finance-view" class="view">
+                <div class="flex justify-between items-center mb-6">
+                     <h2 class="text-2xl font-bold">Finanzas Personales</h2>
+                </div>
+               
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-white p-5 rounded-lg shadow-lg">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold">Pago de Servicios</h3>
+                            <button id="add-service-btn" class="bg-blue-100 text-blue-600 hover:bg-blue-200 transition rounded-full w-8 h-8 flex items-center justify-center">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <div id="services-list" class="space-y-3"></div>
+                    </div>
+                    <div class="lg:col-span-2 space-y-6">
+                         <div class="bg-white p-5 rounded-lg shadow-lg">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">Ingresos</h3>
+                                <button id="add-income-btn" class="bg-green-100 text-green-600 hover:bg-green-200 transition rounded-full w-8 h-8 flex items-center justify-center">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="income-list" class="space-y-4"></div>
+                        </div>
+                         <div class="bg-white p-5 rounded-lg shadow-lg">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold">Gastos</h3>
+                                <button id="add-expense-btn" class="bg-red-100 text-red-600 hover:bg-red-200 transition rounded-full w-8 h-8 flex items-center justify-center">
+                                    <i class="fas fa-plus"></i>
+                                </button>
+                            </div>
+                            <div id="expense-list" class="space-y-4"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: SALUD -->
+            <div id="health-view" class="view">
+                <h2 class="text-2xl font-bold mb-4">Salud</h2>
+                 <p class="text-center text-slate-500 mt-10">Módulo en construcción.</p>
+            </div>
+
+            <!-- VISTA: REDES SOCIALES -->
+            <div id="social-view" class="view">
+                <h2 class="text-2xl font-bold mb-6">Redes Sociales</h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <a href="https://facebook.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                        <i class="fab fa-facebook text-2xl text-blue-600"></i> <span class="font-semibold">Facebook</span>
+                    </a>
+                    <a href="https://instagram.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                        <i class="fab fa-instagram text-2xl text-pink-600"></i> <span class="font-semibold">Instagram</span>
+                    </a>
+                    <a href="https://x.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                        <i class="fab fa-twitter text-2xl text-sky-500"></i> <span class="font-semibold">X (Twitter)</span>
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                        <i class="fab fa-linkedin text-2xl text-blue-700"></i> <span class="font-semibold">LinkedIn</span>
+                    </a>
+                     <a href="https://tiktok.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                        <i class="fab fa-tiktok text-2xl text-black"></i> <span class="font-semibold">TikTok</span>
+                    </a>
+                     <a href="https://youtube.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
+                        <i class="fab fa-youtube text-2xl text-red-600"></i> <span class="font-semibold">YouTube</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- VISTA: ASISTENTE IA -->
+            <div id="ai-view" class="view">
+                <div id="ai-intro">
+                    <h2 class="text-2xl font-bold mb-2">Asistente de Relaciones</h2>
+                    <p class="text-slate-600 mb-6">Presiona el botón para que la IA genere un cuestionario único y divertido sobre tu relación. Tus respuestas son privadas y no se guardan.</p>
+                    <button id="start-ai-test-btn" class="w-full bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-purple-700 transition duration-300 flex items-center justify-center gap-2">
+                        <i class="fas fa-magic"></i> Generar Cuestionario
+                    </button>
+                </div>
+
+                <div id="ai-test" class="hidden">
+                    <div class="mb-6">
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div id="progress-bar" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                        <p id="progress-label" class="text-center text-sm text-slate-500 mt-2"></p>
+                    </div>
+                    <div id="question-container" class="bg-white p-6 rounded-lg shadow-lg">
+                        <h3 id="question-title" class="text-lg font-semibold mb-4"></h3>
+                        <textarea id="question-answer" rows="4" class="w-full p-3 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
+                        <div class="flex justify-between items-center mt-4">
+                            <button id="prev-question-btn" class="bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Anterior</button>
+                            <button id="next-question-btn" class="bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition">Siguiente</button>
+                        </div>
+                    </div>
+                    <div id="user-final-question-container" class="hidden mt-6">
+                         <h3 class="text-lg font-semibold mb-4 text-center">Finalmente, ¿qué pregunta del corazón le hacemos al asistente?</h3>
+                         <input type="text" id="user-final-question" placeholder="Ej: ¿Somos el uno para el otro? / ¿Nuestra locura combina?" class="w-full p-3 text-center border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
+                         <button id="get-ai-response-btn" class="mt-4 w-full bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300">¡Consultar al Oráculo del Amor!</button>
+                    </div>
+                </div>
+
+                <div id="ai-result" class="hidden">
+                    <h2 class="text-2xl font-bold mb-4">Perspectiva del Asistente</h2>
+                    <div id="ai-response-container" class="bg-white p-6 rounded-lg shadow-lg space-y-4 text-slate-700">
+                        <!-- AI response goes here -->
+                    </div>
+                     <p class="text-xs text-slate-400 mt-4 text-center italic">Aviso: El asistente es muy simpático, pero esto no reemplaza el consejo de un profesional. Tómalo con humor y cariño.</p>
+                    <button id="ai-reset-btn" class="mt-6 w-full bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Hacer otro análisis</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+    <!-- MODALS -->
+    <div id="service-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 hidden z-50">
+        <div class="modal-content bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
+            <h2 class="text-xl font-bold mb-6">Agregar Servicio</h2>
+            <form id="service-form">
+                <div class="mb-4">
+                    <label for="service-name" class="block text-sm font-medium text-slate-700">Nombre de la Empresa</label>
+                    <input type="text" id="service-name" placeholder="Ej: Empresa de Energía" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="mb-4">
+                    <label for="service-property" class="block text-sm font-medium text-slate-700">Casa / Propiedad</label>
+                    <input type="text" id="service-property" placeholder="Ej: Edificio Central" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label for="service-apt" class="block text-sm font-medium text-slate-700">Apartamento (Opcional)</label>
+                        <input type="text" id="service-apt" placeholder="Ej: 801" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm">
+                    </div>
+                    <div>
+                        <label for="service-city" class="block text-sm font-medium text-slate-700">Ciudad</label>
+                        <input type="text" id="service-city" placeholder="Ej: Bogotá" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label for="service-url" class="block text-sm font-medium text-slate-700">Página de Consulta (URL)</label>
+                    <input type="url" id="service-url" placeholder="https://..." class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="mb-4">
+                    <label for="service-ref" class="block text-sm font-medium text-slate-700">Número de Referencia</label>
+                    <input type="text" id="service-ref" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" class="cancel-btn bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg">Cancelar</button>
+                    <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+     <div id="transaction-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 hidden z-50">
+        <div class="modal-content bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
+            <h2 id="transaction-modal-title" class="text-xl font-bold mb-6"></h2>
+            <form id="transaction-form">
+                <input type="hidden" id="transaction-type">
+                <div class="mb-4">
+                    <label for="transaction-amount" class="block text-sm font-medium text-slate-700">Monto</label>
+                    <input type="number" id="transaction-amount" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                 <div class="mb-4">
+                    <label for="transaction-source" class="block text-sm font-medium text-slate-700"></label>
+                    <input type="text" id="transaction-source" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="mb-4">
+                    <label for="transaction-date" class="block text-sm font-medium text-slate-700">Fecha</label>
+                    <input type="date" id="transaction-date" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
+                </div>
+                <div class="flex justify-end gap-4 mt-6">
+                    <button type="button" class="cancel-btn bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg">Cancelar</button>
+                    <button type="submit" id="transaction-submit-btn" class="text-white font-semibold py-2 px-4 rounded-lg">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+        // --- PASO 1: AGREGA TU CONFIGURACIÓN DE FIREBASE AQUÍ ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyAWiS_w03U8f_XBGdCRANIt-LyAIUtN2tM",
+            authDomain: "mis-propiedades-d3d58.firebaseapp.com",
+            projectId: "mis-propiedades-d3d58",
+            storageBucket: "mis-propiedades-d3d58.firebasestorage.app",
+            messagingSenderId: "864318821585",
+            appId: "1:864318821585:web:9cbc0c572de67afd1161f0",
+            measurementId: "G-H4MYL95714"
+        };
+
+        // --- PASO 2: AGREGA TU API KEY DE GOOGLE AI STUDIO AQUÍ ---
+        const GEMINI_API_KEY = "AIzaSyBLhjMoZVyn3MjRgckcmW9Vavf9bR9Yx70";
+
+        // --- INICIALIZACIÓN ---
+        let app;
+        try {
+            app = initializeApp(firebaseConfig);
+        } catch (e) {
+            document.getElementById('loading-overlay').innerHTML = `<div class="text-center p-4"><h3 class="text-xl font-bold text-red-600">Configuración Requerida</h3><p class="mt-2 text-slate-700">Debes agregar tu objeto 'firebaseConfig' en el archivo HTML para conectar la aplicación.</p></div>`;
+            console.error("Firebase initialization failed:", e);
+            return;
+        }
+
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        const views = document.querySelectorAll('.view');
+        const menuButtons = document.querySelectorAll('.menu-btn');
+        const backButton = document.getElementById('back-to-home');
+        const currentDateEl = document.getElementById('current-date');
+        const body = document.body;
+
+        // State
+        let currentView = 'home-view';
+        let currentUser = null;
+        let financeData = { services: [], incomes: [], expenses: [] };
+
+        // --- AUTHENTICATION ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                body.classList.remove('logged-out');
+                body.classList.add('logged-in');
+                document.getElementById('user-greeting').textContent = `Hola, ${user.displayName.split(' ')[0]}`;
+                document.getElementById('user-email').textContent = user.email;
+                
+                await loadDataFromFirestore();
+                navigateTo('home-view');
+            } else {
+                currentUser = null;
+                body.classList.remove('logged-in');
+                body.classList.add('logged-out');
+                financeData = { services: [], incomes: [], expenses: [] };
+            }
+             document.getElementById('loading-overlay').style.display = 'none';
+        });
+        
+        const signIn = () => signInWithPopup(auth, provider).catch(e => console.error(e));
+        const logOut = () => signOut(auth).catch(e => console.error(e));
+
+        document.getElementById('sign-in-btn').addEventListener('click', signIn);
+        document.getElementById('sign-out-btn').addEventListener('click', logOut);
+        
+
+        // --- DATA PERSISTENCE (FIRESTORE) ---
+        const saveDataToFirestore = async () => {
+            if (!currentUser) return;
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            try {
+                await setDoc(userDocRef, { finance: financeData }, { merge: true });
+            } catch (error) {
+                console.error("Error saving data: ", error);
+            }
+        };
+        const loadDataFromFirestore = async () => {
+            if (!currentUser) return;
+            const userDocRef = doc(db, 'users', currentUser.uid);
+            try {
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists() && docSnap.data().finance) {
+                    financeData = docSnap.data().finance;
+                } else {
+                    financeData = { services: [], incomes: [], expenses: [] };
+                }
+            } catch (error) {
+                 console.error("Error loading data: ", error);
+            }
+        };
+
+        // --- NAVIGATION ---
+        const navigateTo = (viewId) => {
+            currentView = viewId;
+            views.forEach(v => v.classList.remove('active'));
+            document.getElementById(viewId).classList.add('active');
+            backButton.classList.toggle('hidden', viewId === 'home-view');
+
+            if(viewId === 'finance-view') {
+                renderFinanceView();
+            }
+        };
+
+        menuButtons.forEach(btn => {
+            btn.addEventListener('click', () => navigateTo(btn.dataset.view));
+        });
+
+        backButton.addEventListener('click', () => navigateTo('home-view'));
+
+        currentDateEl.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        
+        // --- FINANCE MODULE ---
+        const serviceModal = document.getElementById('service-modal');
+        const transactionModal = document.getElementById('transaction-modal');
+
+        const openModal = (modal) => modal.classList.remove('hidden');
+        const closeModal = (modal) => modal.classList.add('hidden');
+        
+        document.getElementById('add-service-btn').addEventListener('click', () => openModal(serviceModal));
+        document.getElementById('add-income-btn').addEventListener('click', () => openTransactionModal('income'));
+        document.getElementById('add-expense-btn').addEventListener('click', () => openTransactionModal('expense'));
+
+        document.querySelectorAll('.cancel-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                closeModal(serviceModal);
+                closeModal(transactionModal);
+            });
+        });
+
+        const formatCurrency = (amount) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount);
+        const getMonthYear = (dateString) => new Date(dateString + 'T00:00:00').toLocaleString('es-ES', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
+
+        // Services Logic
+        const renderServices = () => {
+            const list = document.getElementById('services-list');
+            list.innerHTML = '';
+            if(!financeData.services || financeData.services.length === 0){
+                list.innerHTML = `<p class="text-sm text-center text-slate-400">Agrega tus servicios.</p>`;
+                return;
+            }
+            financeData.services.forEach((service, index) => {
+                const serviceEl = document.createElement('div');
+                serviceEl.className = 'p-3 bg-slate-50 rounded-lg flex items-center justify-between';
+                
+                let location = `${service.property}, ${service.city}`;
+                if (service.apt) {
+                    location = `${service.property}, Apt ${service.apt}, ${service.city}`;
+                }
+
+                serviceEl.innerHTML = `
+                    <div>
+                        <p class="font-bold">${service.name}</p>
+                        <p class="text-xs text-slate-500">${location}</p>
+                        <p class="text-xs text-slate-500 mt-1">Ref: <strong>${service.ref}</strong></p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                         <a href="${service.url.includes('?') ? service.url + service.ref : service.url + '?ref=' + service.ref}" target="_blank" class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-600 transition" title="Ir a Pagar">
+                            <i class="fas fa-external-link-alt"></i>
+                        </a>
+                        <button class="delete-service-btn text-slate-400 hover:text-red-500 transition" data-index="${index}" title="Eliminar">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+                list.appendChild(serviceEl);
+            });
+        };
+        
+        document.getElementById('service-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!financeData.services) financeData.services = [];
+            financeData.services.push({
+                name: document.getElementById('service-name').value,
+                property: document.getElementById('service-property').value,
+                apt: document.getElementById('service-apt').value,
+                city: document.getElementById('service-city').value,
+                url: document.getElementById('service-url').value,
+                ref: document.getElementById('service-ref').value
+            });
+            saveDataToFirestore();
+            renderServices();
+            closeModal(serviceModal);
+            e.target.reset();
+        });
+
+        document.getElementById('services-list').addEventListener('click', (e) => {
+            if(e.target.closest('.delete-service-btn')) {
+                const index = e.target.closest('.delete-service-btn').dataset.index;
+                financeData.services.splice(index, 1);
+                saveDataToFirestore();
+                renderServices();
+            }
+        });
+
+        // Transaction Logic
+        const openTransactionModal = (type) => {
+            const form = document.getElementById('transaction-form');
+            form.reset();
+            form.querySelector('#transaction-type').value = type;
+            const title = document.getElementById('transaction-modal-title');
+            const sourceLabel = form.querySelector('label[for="transaction-source"]');
+            const submitBtn = document.getElementById('transaction-submit-btn');
+
+            if(type === 'income') {
+                title.textContent = "Agregar Ingreso";
+                sourceLabel.textContent = "Fuente";
+                submitBtn.className = "bg-green-600 text-white font-semibold py-2 px-4 rounded-lg";
+            } else {
+                 title.textContent = "Agregar Gasto";
+                 sourceLabel.textContent = "Categoría";
+                 submitBtn.className = "bg-red-600 text-white font-semibold py-2 px-4 rounded-lg";
+            }
+            openModal(transactionModal);
+        };
+
+        document.getElementById('transaction-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const type = document.getElementById('transaction-type').value;
+            const transaction = {
+                id: Date.now(),
+                amount: parseFloat(document.getElementById('transaction-amount').value),
+                source: document.getElementById('transaction-source').value,
+                date: document.getElementById('transaction-date').value
+            };
+            
+            if(type === 'income') {
+                if (!financeData.incomes) financeData.incomes = [];
+                financeData.incomes.push(transaction);
+            } else {
+                if (!financeData.expenses) financeData.expenses = [];
+                financeData.expenses.push(transaction);
+            }
+            saveDataToFirestore();
+            renderTransactions(type === 'income' ? 'incomes' : 'expenses', type === 'income' ? 'income-list' : 'expense-list');
+            closeModal(transactionModal);
+        });
+
+        const renderTransactions = (type, listId) => {
+            const list = document.getElementById(listId);
+            list.innerHTML = '';
+            const data = financeData[type];
+            
+            if(!data || data.length === 0){
+                list.innerHTML = `<p class="text-sm text-center text-slate-400">No hay registros.</p>`;
+                return;
+            }
+            
+            const grouped = data.reduce((acc, item) => {
+                const month = getMonthYear(item.date);
+                if(!acc[month]) acc[month] = [];
+                acc[month].push(item);
+                return acc;
+            }, {});
+
+            Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(month => {
+                const monthContainer = document.createElement('div');
+                let total = 0;
+                const itemsHtml = grouped[month].map(item => {
+                    total += item.amount;
+                    return `
+                        <div class="flex justify-between items-center text-sm py-1">
+                            <span>${item.source} <span class="text-xs text-slate-400">(${new Date(item.date+'T00:00:00').toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit'})})</span></span>
+                            <span class="font-semibold">${formatCurrency(item.amount)}</span>
+                        </div>
+                    `;
+                }).join('');
+
+                monthContainer.innerHTML = `
+                    <div class="bg-slate-50 p-3 rounded-lg">
+                        <div class="flex justify-between items-center font-bold mb-2">
+                            <span>${month}</span>
+                            <span>${formatCurrency(total)}</span>
+                        </div>
+                        <div class="space-y-1">${itemsHtml}</div>
+                    </div>
+                `;
+                list.appendChild(monthContainer);
+            });
+        };
+        
+        const renderFinanceView = () => {
+            renderServices();
+            renderTransactions('incomes', 'income-list');
+            renderTransactions('expenses', 'expense-list');
+        };
+
+        // --- AI ASSISTANT LOGIC ---
+        const aiIntro = document.getElementById('ai-intro');
+        const aiTest = document.getElementById('ai-test');
+        const aiResult = document.getElementById('ai-result');
+        const startTestBtn = document.getElementById('start-ai-test-btn');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const prevQuestionBtn = document.getElementById('prev-question-btn');
+        const getAiResponseBtn = document.getElementById('get-ai-response-btn');
+        const aiResetBtn = document.getElementById('ai-reset-btn');
+        
+        const questionTitle = document.getElementById('question-title');
+        const questionAnswer = document.getElementById('question-answer');
+        const progressBar = document.getElementById('progress-bar');
+        const progressLabel = document.getElementById('progress-label');
+        const userFinalQuestionContainer = document.getElementById('user-final-question-container');
+        const userFinalQuestionInput = document.getElementById('user-final-question');
+
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let answers = [];
+
+        const startTest = async () => {
+            startTestBtn.disabled = true;
+            startTestBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generando preguntas...`;
+
+            try {
+                const generatedQuestions = await generateAiQuestions();
+                questions = generatedQuestions;
+                answers = new Array(questions.length).fill('');
+                
+                aiIntro.classList.add('hidden');
+                aiTest.classList.remove('hidden');
+                aiResult.classList.add('hidden');
+                currentQuestionIndex = 0;
+                userFinalQuestionContainer.classList.add('hidden');
+                document.getElementById('question-container').classList.remove('hidden');
+                displayQuestion();
+
+            } catch (error) {
+                alert("No se pudieron generar las preguntas. Revisa tu API Key o intenta más tarde.");
+            } finally {
+                startTestBtn.disabled = false;
+                startTestBtn.innerHTML = `<i class="fas fa-magic"></i> Generar Cuestionario`;
+            }
+        };
+        
+        const generateAiQuestions = async () => {
+            const prompt = "Eres un consejero de relaciones divertido y creativo. Genera una lista de 5 preguntas únicas, jocosas y amigables para que un usuario reflexione sobre su relación de pareja. Las preguntas deben estar en español. Devuelve el resultado como un array JSON de strings. Por ejemplo: [\"pregunta 1\", \"pregunta 2\", ...]";
+            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "ARRAY",
+                        items: { "type": "STRING" }
+                    }
+                }
+            };
+
+            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+            if (!response.ok) throw new Error("API call failed");
+            const result = await response.json();
+            const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+            return JSON.parse(jsonText);
+        };
+
+        const displayQuestion = () => {
+            questionTitle.textContent = questions[currentQuestionIndex];
+            questionAnswer.value = answers[currentQuestionIndex];
+            updateProgress();
+            
+            prevQuestionBtn.disabled = currentQuestionIndex === 0;
+            nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? 'Finalizar' : 'Siguiente';
+        };
+
+        const updateProgress = () => {
+             const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+             progressBar.style.width = `${progress}%`;
+             progressLabel.textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
+        };
+
+        const nextQuestion = () => {
+            answers[currentQuestionIndex] = questionAnswer.value;
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            } else {
+                document.getElementById('question-container').classList.add('hidden');
+                userFinalQuestionContainer.classList.remove('hidden');
+            }
+        };
+
+        const prevQuestion = () => {
+             if (currentQuestionIndex > 0) {
+                 answers[currentQuestionIndex] = questionAnswer.value;
+                 currentQuestionIndex--;
+                 displayQuestion();
+             }
+        };
+
+        const getAiResponse = async () => {
+            if (GEMINI_API_KEY === "PEGA_TU_API_KEY_AQUÍ") {
+                const responseContainer = document.getElementById('ai-response-container');
+                responseContainer.innerHTML = `<p class='text-red-500 font-semibold'>Error de Configuración: Debes agregar tu API Key de Google AI Studio en el archivo HTML para que el asistente funcione.</p>`;
+                aiTest.classList.add('hidden');
+                aiResult.classList.remove('hidden');
+                return;
+            }
+            aiTest.classList.add('hidden');
+            aiResult.classList.remove('hidden');
+            const responseContainer = document.getElementById('ai-response-container');
+            responseContainer.innerHTML = `<div class="text-center"><i class="fas fa-spinner fa-spin text-3xl text-purple-600"></i><p class="mt-3 text-slate-500">El asistente está analizando tus respuestas...</p></div>`;
+            const userFinalQuestion = userFinalQuestionInput.value || "¿Cuál es la perspectiva general de mi relación?";
+            const systemPrompt = "Eres un asistente de relaciones con un gran sentido del humor, muy amigable y un poco pícaro. Tu objetivo es dar una perspectiva divertida y positiva sobre la relación del usuario. Usa un tono jocoso y amable, como si fueras un buen amigo dando un consejo con una sonrisa. Analiza las respuestas para encontrar los puntos fuertes y las dinámicas divertidas. Puedes usar metáforas graciosas o comparaciones inesperadas. Al final, siempre da un mensaje optimista y cálido. No des respuestas definitivas ni predicciones, solo ofrece una perspectiva para hacer sonreír al usuario y ayudarle a reflexionar de forma ligera.";
+            let userPrompt = `Basado en las siguientes respuestas sobre mi relación, por favor dame tu perspectiva. Mi pregunta principal es: "${userFinalQuestion}".\n\n`;
+            questions.forEach((q, i) => { userPrompt += `Pregunta: ${q}\nRespuesta: ${answers[i] || 'No respondido'}\n\n`; });
+            const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
+            try {
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+                const payload = { contents: [{ parts: [{ text: fullPrompt }] }], };
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) {
+                    const errorBody = await response.json().catch(() => ({ error: { message: response.statusText } }));
+                    console.error("API Error Response:", errorBody);
+                    throw new Error(`Error de API: ${response.status} - ${errorBody.error.message}`);
+                }
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (text) {
+                    let htmlResponse = text.replace(/\n/g, '<br>');
+                    htmlResponse = htmlResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                    responseContainer.innerHTML = htmlResponse;
+                } else {
+                     responseContainer.textContent = "No se pudo obtener una respuesta válida del asistente. Por favor, intenta de nuevo.";
+                }
+            } catch (error) {
+                console.error("Error fetching AI response:", error);
+                responseContainer.innerHTML = `<p class='text-red-500'>Ocurrió un error al contactar al asistente. Por favor, revisa tu conexión o intenta más tarde. (Detalle: ${error.message})</p>`;
+            }
+        };
+        
+        const resetAi = () => {
+            aiIntro.classList.remove('hidden');
+            aiTest.classList.add('hidden');
+            aiResult.classList.add('hidden');
+            document.getElementById('question-container').classList.remove('hidden');
+            userFinalQuestionContainer.classList.add('hidden');
+            userFinalQuestionInput.value = '';
+        };
+
+        startTestBtn.addEventListener('click', startTest);
+        nextQuestionBtn.addEventListener('click', nextQuestion);
+        prevQuestionBtn.addEventListener('click', prevQuestion);
+        getAiResponseBtn.addEventListener('click', getAiResponse);
+        aiResetBtn.addEventListener('click', resetAi);
+
+    });
+    </script>
+</body>
+</html>
