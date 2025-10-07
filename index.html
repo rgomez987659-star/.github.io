@@ -117,24 +117,24 @@
 </style>
 </head>
 <body>
-  <header class="top"><h1>JustPersonal · Panel Principal</h1><button class="btn ghost" id="theme-toggle" title="Cambiar tema">🌙</button></header>
+  <header class="top"><h1>JustPersonal · Panel Principal</h1><div class="row"><button class="btn ghost" id="migrate-btn" title="Migrar datos de LocalStorage a Firebase">Migrar Datos</button><button class="btn ghost" id="theme-toggle" title="Cambiar tema">🌙</button></div></header>
   
   <main>
     <div class="dashboard-grid">
-      <div class="card section-launcher" onclick="openSection('panel-finanzas')"><span>💰</span><span>Finanzas</span></div>
-      <div class="card section-launcher" onclick="openSection('panel-salud')"><span>🏥</span><span>Salud</span></div>
-      <div class="card section-launcher" onclick="openSection('panel-entretenimiento')"><span>🎮</span><span>Entretenimiento</span></div>
-      <div class="card section-launcher" onclick="openSection('panel-deportes')"><span>⚽</span><span>Deportes</span></div>
-      <div class="card section-launcher" onclick="openSection('panel-cocina')"><span>🍳</span><span>Cocina</span></div>
-      <div class="card section-launcher" onclick="openSection('panel-redes')"><span>📱</span><span>Redes Sociales</span></div>
+      <div class="card section-launcher" data-panel="panel-finanzas"><span>💰</span><span>Finanzas</span></div>
+      <div class="card section-launcher" data-panel="panel-salud"><span>🏥</span><span>Salud</span></div>
+      <div class="card section-launcher" data-panel="panel-entretenimiento"><span>🎮</span><span>Entretenimiento</span></div>
+      <div class="card section-launcher" data-panel="panel-deportes"><span>⚽</span><span>Deportes</span></div>
+      <div class="card section-launcher" data-panel="panel-cocina"><span>🍳</span><span>Cocina</span></div>
+      <div class="card section-launcher" data-panel="panel-redes"><span>📱</span><span>Redes Sociales</span></div>
     </div>
   </main>
 
-  <div class="overlay" id="panel-overlay" onclick="closeAll()"></div>
+  <div class="overlay" id="panel-overlay"></div>
   <div class="modal" id="modal"><div class="box"><header><span id="modal-title">Detalle</span><button class="btn ghost" id="modal-close">✖</button></header><div class="content" id="modal-content"></div></div></div>
   
   <div class="section-panel" id="panel-finanzas">
-    <div class="section-header"><div class="section-title">Finanzas</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-finanzas')" title="Cerrar">✖</button></div></div>
+    <div class="section-header"><div class="section-title">Finanzas</div><div class="section-actions"><button class="btn ghost btn-close-section" title="Cerrar">✖</button></div></div>
     <div class="section-body">
       <div aria-label="Gestión de Finanzas" class="tabs" role="tablist">
         <button aria-controls="panel-resumen" aria-selected="true" class="tab" id="tab-resumen" role="tab">Resumen</button>
@@ -146,7 +146,7 @@
       </div>
       
       <div id="panel-resumen" role="tabpanel">
-        <div class="row" style="align-items:end;gap:16px; margin-bottom: 24px;"><input id="res-mes" type="month"/> <button class="btn" id="btn-refrescar-resumen" type="button">Refrescar</button> <div class="row" style="margin-left:auto"> <button class="btn" id="btn-export" type="button">Exportar</button> <input accept="application/json" class="hidden" id="file-import" type="file"/> <button class="btn ghost" id="btn-import" type="button">Importar</button> </div></div>
+        <div class="row" style="align-items:end;gap:16px; margin-bottom: 24px;"><input id="res-mes" type="month"/> <button class="btn" id="btn-refrescar-resumen" type="button">Refrescar</button></div>
         <h3 style="margin-bottom: 12px;">Resumen del Mes</h3>
         <div class="kpi"><div class="box"><span class="icon">📥</span><div class="title">Ingresos Mes</div><div class="value" id="kpi-ing-mes">$0</div></div> <div class="box"><span class="icon">🏠</span><div class="title">Alquiler Mes</div><div class="value" id="kpi-renta-mes">$0</div></div> <div class="box"><span class="icon">📤</span><div class="title">Gastos Mes</div><div class="value" id="kpi-gas-mes">$0</div></div> <div class="box"><span class="icon">💰</span><div class="title">Saldo Mes</div><div class="value" id="kpi-saldo-mes">$0</div></div></div>
         <h3 style="margin: 24px 0 12px 0;">Acumulado Total</h3>
@@ -180,73 +180,110 @@
     </div>
   </div>
   
-  <div class="section-panel" id="panel-salud"><div class="section-header"><div class="section-title">Salud</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-salud')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Registro de Salud</h2></header><div class="content"><div class="grid two"><div class="col"><label for="peso">Peso (kg)</label><input id="peso" type="number"/></div><div class="col"><label for="altura">Altura (cm)</label><input id="altura" type="number"/></div><div class="col"><label for="presion">Presión arterial</label><input id="presion"/></div><div class="col"><label for="fecha-salud">Fecha</label><input id="fecha-salud" type="date"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
-  <div class="section-panel" id="panel-entretenimiento"><div class="section-header"><div class="section-title">Entretenimiento</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-entretenimiento')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Añadir Contenido</h2></header><div class="content"><div class="grid two"><div class="col"><label for="tipo-contenido">Tipo</label><select id="tipo-contenido"><option value="pelicula">Película</option><option value="serie">Serie</option><option value="videojuego">Videojuego</option></select></div><div class="col"><label for="titulo">Título</label><input id="titulo"/></div><div class="col"><label for="estado">Estado</label><select id="estado"><option value="por-ver">Por ver</option><option value="viendo">Viendo</option><option value="visto">Visto</option></select></div><div class="col"><label for="calificacion">Calificación (1-5)</label><input id="calificacion" type="number" min="1" max="5"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
-  <div class="section-panel" id="panel-deportes"><div class="section-header"><div class="section-title">Deportes y Enlaces</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-deportes')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Añadir Enlace Favorito</h2></header><div class="content"><form autocomplete="off" class="grid two" id="form-link"><div class="col"><label for="link-nombre">Nombre del Sitio</label><input id="link-nombre" required=""/></div><div class="col"><label for="link-url">URL del Sitio</label><input id="link-url" required="" type="url"/></div><div class="row" style="align-items:end;"><button class="btn primary" type="submit">Guardar</button></div></form></div></div><div class="card" style="margin-top:24px"><header><h2>Enlaces Guardados</h2></header><div class="content"><table id="tabla-links"><thead><tr><th>Nombre</th><th>URL</th><th></th></tr></thead><tbody></tbody></table></div></div></div></div>
-  <div class="section-panel" id="panel-cocina"><div class="section-header"><div class="section-title">Mis Recetas</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-cocina')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Nueva Receta</h2></header><div class="content"><form autocomplete="off" class="grid" id="form-receta"><div class="col full"><label for="receta-nombre">Nombre</label><input id="receta-nombre" required=""/></div><div class="col"><label for="receta-ingredientes">Ingredientes</label><textarea id="receta-ingredientes" rows="5"></textarea></div><div class="col"><label for="receta-instrucciones">Instrucciones</label><textarea id="receta-instrucciones" rows="5"></textarea></div><div class="row"><button class="btn primary" type="submit">Guardar</button></div></form></div></div><div class="card" style="margin-top:24px"><header><h2>Recetas Guardadas</h2></header><div class="content"><table id="tabla-recetas"><thead><tr><th>Nombre</th><th>Acciones</th></tr></thead><tbody></tbody></table></div></div></div></div>
-  <div class="section-panel" id="panel-redes"><div class="section-header"><div class="section-title">Redes Sociales</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-redes')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Mis Perfiles</h2></header><div class="content"><div class="grid two"><div class="col"><label for="red-social">Red Social</label><select id="red-social"><option value="facebook">Facebook</option><option value="twitter">Twitter</option><option value="instagram">Instagram</option></select></div><div class="col"><label for="usuario">Usuario</label><input id="usuario"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
+  <div class="section-panel" id="panel-salud"><div class="section-header"><div class="section-title">Salud</div><div class="section-actions"><button class="btn ghost btn-close-section" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Registro de Salud</h2></header><div class="content"><div class="grid two"><div class="col"><label for="peso">Peso (kg)</label><input id="peso" type="number"/></div><div class="col"><label for="altura">Altura (cm)</label><input id="altura" type="number"/></div><div class="col"><label for="presion">Presión arterial</label><input id="presion"/></div><div class="col"><label for="fecha-salud">Fecha</label><input id="fecha-salud" type="date"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
+  <div class="section-panel" id="panel-entretenimiento"><div class="section-header"><div class="section-title">Entretenimiento</div><div class="section-actions"><button class="btn ghost btn-close-section" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Añadir Contenido</h2></header><div class="content"><div class="grid two"><div class="col"><label for="tipo-contenido">Tipo</label><select id="tipo-contenido"><option value="pelicula">Película</option><option value="serie">Serie</option><option value="videojuego">Videojuego</option></select></div><div class="col"><label for="titulo">Título</label><input id="titulo"/></div><div class="col"><label for="estado">Estado</label><select id="estado"><option value="por-ver">Por ver</option><option value="viendo">Viendo</option><option value="visto">Visto</option></select></div><div class="col"><label for="calificacion">Calificación (1-5)</label><input id="calificacion" type="number" min="1" max="5"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
+  <div class="section-panel" id="panel-deportes"><div class="section-header"><div class="section-title">Deportes y Enlaces</div><div class="section-actions"><button class="btn ghost btn-close-section" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Añadir Enlace Favorito</h2></header><div class="content"><form autocomplete="off" class="grid two" id="form-link"><div class="col"><label for="link-nombre">Nombre del Sitio</label><input id="link-nombre" required=""/></div><div class="col"><label for="link-url">URL del Sitio</label><input id="link-url" required="" type="url"/></div><div class="row" style="align-items:end;"><button class="btn primary" type="submit">Guardar</button></div></form></div></div><div class="card" style="margin-top:24px"><header><h2>Enlaces Guardados</h2></header><div class="content"><table id="tabla-links"><thead><tr><th>Nombre</th><th>URL</th><th></th></tr></thead><tbody></tbody></table></div></div></div></div>
+  <div class="section-panel" id="panel-cocina"><div class="section-header"><div class="section-title">Mis Recetas</div><div class="section-actions"><button class="btn ghost btn-close-section" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Nueva Receta</h2></header><div class="content"><form autocomplete="off" class="grid" id="form-receta"><div class="col full"><label for="receta-nombre">Nombre</label><input id="receta-nombre" required=""/></div><div class="col"><label for="receta-ingredientes">Ingredientes</label><textarea id="receta-ingredientes" rows="5"></textarea></div><div class="col"><label for="receta-instrucciones">Instrucciones</label><textarea id="receta-instrucciones" rows="5"></textarea></div><div class="row"><button class="btn primary" type="submit">Guardar</button></div></form></div></div><div class="card" style="margin-top:24px"><header><h2>Recetas Guardadas</h2></header><div class="content"><table id="tabla-recetas"><thead><tr><th>Nombre</th><th>Acciones</th></tr></thead><tbody></tbody></table></div></div></div></div>
+  <div class="section-panel" id="panel-redes"><div class="section-header"><div class="section-title">Redes Sociales</div><div class="section-actions"><button class="btn ghost btn-close-section" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Mis Perfiles</h2></header><div class="content"><div class="grid two"><div class="col"><label for="red-social">Red Social</label><select id="red-social"><option value="facebook">Facebook</option><option value="twitter">Twitter</option><option value="instagram">Instagram</option></select></div><div class="col"><label for="usuario">Usuario</label><input id="usuario"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
   
   <div class="chat-launcher"><button class="btn primary" id="open-chat" title="Asistente">💬</button></div>
   <aside class="chat-bubble" id="chat-panel"><div class="chat-header"><div class="chat-title">Asistente Virtual</div><div class="chat-actions"><button class="btn ghost" id="btn-clear-chat" title="Borrar">🗑️</button><button class="btn ghost" id="btn-close-chat" title="Cerrar">✖</button></div></div><div class="chipbar"><span class="chip" data-chip="resumen">📊 Resumen Financiero</span><span class="chip" data-chip="propiedades">🏠 Mis Propiedades</span></div><div class="chat-body" id="chat-body"></div><div class="chat-footer"><input id="chat-input" placeholder="Pregunta algo..."/><button class="btn primary" id="chat-send">Enviar</button></div></aside>
   <div class="toast" id="toast"></div>
 
-  <script>
-    // ===== CONFIGURACIÓN =====
-    const API_CONFIG = {
-        duckDuckGo: (query) => `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1&t=justpersonalapp`,
-        wikipediaSearch: (query) => `https://es.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=1&namespace=0&format=json&origin=*`,
-        wikipediaSummary: (title) => `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
-    };
-    const DB={ props:'fin:props', ing:'fin:ing', gas:'fin:gas', serv:'fin:serv', chat:'fin:chat', alq:'fin:alq', links: 'app:links', recetas: 'app:recetas' };
+  <script type="module">
+    // ===== CONFIGURACIÓN E IMPORTACIÓN DE FIREBASE =====
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore.js";
 
-    // ===== UTILIDADES =====
+    const firebaseConfig = {
+      apiKey: "AIzaSyA9vOVrtGrdVYU9FgUCtpZWOTwpmO5t2n4",
+      authDomain: "propiedades-7f7fe.firebaseapp.com",
+      projectId: "propiedades-7f7fe",
+      storageBucket: "propiedades-7f7fe.appspot.com",
+      messagingSenderId: "429219311761",
+      appId: "1:429219311761:web:4d45c7c5e53cc7c5394f30"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth();
+    const db = getFirestore(app);
+    let userDocRef;
+
+    // ===== UTILIDADES Y ESTADO GLOBAL =====
     const $=(s,r=document)=>r.querySelector(s); 
     const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
-    const toast=(m)=>{const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500)};
-    const storage={ get:(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}, set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)) };
+    const toast=(m)=>{const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000)};
     const fmt=(n)=> new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(n||0));
     const toYM=d=>(d||'').slice(0,7); 
 
-    // ===== ESTADO =====
-    let state={};
-    function initState(){
-        state = { 
-            propiedades:storage.get(DB.props,[]), ingresos:storage.get(DB.ing,[]), gastos:storage.get(DB.gas,[]), 
-            servicios:storage.get(DB.serv,[]), chat:storage.get(DB.chat,[]), alquileres:storage.get(DB.alq,[]),
-            links: storage.get(DB.links, []), recetas: storage.get(DB.recetas, [])
-        };
-    }
-    const persist=()=>{ 
-        storage.set(DB.props, state.propiedades); storage.set(DB.ing, state.ingresos); storage.set(DB.gas, state.gastos);
-        storage.set(DB.serv, state.servicios); storage.set(DB.chat, state.chat); storage.set(DB.alq, state.alquileres);
-        storage.set(DB.links, state.links); storage.set(DB.recetas, state.recetas);
+    let state={
+        propiedades: [], ingresos: [], gastos: [], servicios: [], 
+        chat: [], alquileres: [], links: [], recetas: []
     };
+    
+    // ===== SINCRONIZACIÓN CON FIREBASE =====
+    async function persist() {
+        if (!userDocRef) return;
+        try {
+            await setDoc(userDocRef, state);
+        } catch (error) {
+            console.error("Error al guardar en Firebase:", error);
+            toast("Error al guardar datos.");
+        }
+    }
 
+    // ===== AUTENTICACIÓN Y CARGA INICIAL DE DATOS =====
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            userDocRef = doc(db, "users", user.uid);
+            onSnapshot(userDocRef, (doc) => {
+                const data = doc.exists() ? doc.data() : {};
+                Object.keys(state).forEach(key => {
+                    state[key] = data[key] || [];
+                });
+                renderAll();
+                loadChatHistory();
+            });
+        } else {
+            signInAnonymously(auth).catch(error => console.error("Error de autenticación anónima:", error));
+        }
+    });
+    
     // ===== UI (PANELES, MODALES, TABS, DARK MODE) =====
-    (function() {
-      const btn = $('#theme-toggle'); const storedTheme = storage.get('theme'); const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; const doc = document.documentElement;
-      const applyTheme = (theme) => { doc.setAttribute('data-theme', theme); btn.textContent = theme === 'dark' ? '☀️' : '🌙'; };
-      btn.addEventListener('click', () => { const newTheme = doc.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; storage.set('theme', newTheme); applyTheme(newTheme); });
-      applyTheme(storedTheme || (prefersDark ? 'dark' : 'light'));
-    })();
     const modal = $('#modal'); const overlay = $('#panel-overlay');
-    function openSection(id) { overlay.classList.add('open'); $(`#${id}`).classList.add('open'); }
-    function closeSection(id) { $(`#${id}`).classList.remove('open'); if (!$$('.section-panel.open').length) overlay.classList.remove('open');}
+    function openSection(id) { overlay.classList.add('open'); $(`#${id}`)?.classList.add('open'); }
+    function closeSection(id) { $(`#${id}`)?.classList.remove('open'); if (!$$('.section-panel.open').length) overlay.classList.remove('open');}
     function openModal(title, content) { $('#modal-title').textContent = title; $('#modal-content').innerHTML = content; overlay.classList.add('open'); modal.classList.add('open'); }
     function closeModal() { modal.classList.remove('open'); if (!$$('.section-panel.open').length) overlay.classList.remove('open'); }
     function closeAll() { $$('.section-panel.open').forEach(p => p.classList.remove('open')); closeModal(); }
-    $('#modal-close').addEventListener('click', closeModal);
-    (function(){ 
-      const tabsContainer = $('#panel-finanzas');
-      if (!tabsContainer) return;
-      const tabs=$$('.tab', tabsContainer); 
-      const panels=$$('div[id^="panel-"]', tabsContainer);
-      window.selectFinanceTab=(id)=>{ 
-          tabs.forEach(t=>t.setAttribute('aria-selected',t.id === 'tab-'+id)); 
-          panels.forEach(p=>p.classList.toggle('hidden', p.id !== 'panel-'+id)); 
-      }; 
-      tabs.forEach(t=> t.addEventListener('click',()=> window.selectFinanceTab(t.id.replace('tab-','')))); 
-    })();
+    
+    function attachEventListeners() {
+        // Event Listeners para botones principales y UI
+        $('#modal-close').addEventListener('click', closeModal);
+        $('#panel-overlay').addEventListener('click', closeAll);
+        $$('.section-launcher').forEach(launcher => launcher.addEventListener('click', () => openSection(launcher.dataset.panel)));
+        $$('.btn-close-section').forEach(btn => btn.addEventListener('click', () => closeSection(btn.closest('.section-panel').id)));
+        $('#theme-toggle').addEventListener('click', () => { 
+            const doc = document.documentElement;
+            const newTheme = doc.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; 
+            localStorage.setItem('theme', newTheme); 
+            doc.setAttribute('data-theme', newTheme); 
+            $('#theme-toggle').textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        });
+
+        // Tabs
+        const tabsContainer = $('#panel-finanzas');
+        if (!tabsContainer) return;
+        const tabs = $$('.tab', tabsContainer);
+        const panels = $$('div[id^="panel-"]', tabsContainer);
+        window.selectFinanceTab = (id) => {
+            tabs.forEach(t => t.setAttribute('aria-selected', t.id === 'tab-' + id));
+            panels.forEach(p => p.classList.toggle('hidden', p.id !== 'panel-' + id));
+        };
+        tabs.forEach(t => t.addEventListener('click', () => window.selectFinanceTab(t.id.replace('tab-', ''))));
+    }
+
 
     // ===== RENDERIZADO =====
     function renderAll() {
@@ -279,139 +316,141 @@
         $('#form-propiedad').scrollIntoView({ behavior: 'smooth', block: 'center' });
         toast('Editando propiedad...');
     }
-    $('#form-propiedad').addEventListener('submit', (e)=>{ e.preventDefault(); const id=$('#prop-id').value||crypto.randomUUID(); const data={id, nombre:$('#prop-nombre').value, ciudad:$('#prop-ciudad').value, arrendatario:$('#prop-arrendatario').value, alquiler:$('#prop-alquiler').value}; if(editingPropIndex!==null){state.propiedades[editingPropIndex]=data; toast('Actualizado');}else{state.propiedades.push(data); toast('Creado');} persist(); renderPropiedades(); renderResumen(); editingPropIndex=null; e.target.reset();});
+    $('#form-propiedad').addEventListener('submit', async (e)=>{ e.preventDefault(); const id=$('#prop-id').value||crypto.randomUUID(); const data={id, nombre:$('#prop-nombre').value, ciudad:$('#prop-ciudad').value, arrendatario:$('#prop-arrendatario').value, alquiler:$('#prop-alquiler').value}; if(editingPropIndex!==null){state.propiedades[editingPropIndex]=data; toast('Actualizado');}else{state.propiedades.push(data); toast('Creado');} await persist(); editingPropIndex=null; e.target.reset();});
     $('#btn-cancelar-propiedad').addEventListener('click', () => { editingPropIndex = null; });
-    $('#form-alquiler').addEventListener('submit',(e)=>{ e.preventDefault(); const a={propId:$('#alq-propiedad').value, mes:$('#alq-mes').value, monto:$('#alq-monto').value}; const idx=state.alquileres.findIndex(al=>al.propId===a.propId&&al.mes===a.mes); if(idx>=0){state.alquileres[idx]=a; toast('Actualizado');}else{state.alquileres.push(a); toast('Registrado');} persist(); renderAlquileres(); renderResumen(); e.target.reset(); });
-    $('#form-ingreso').addEventListener('submit',(e)=>{ e.preventDefault(); state.ingresos.push({monto:$('#ing-monto').value, desc:$('#ing-desc').value, fecha:$('#ing-fecha').value}); persist(); renderIngresos(); renderResumen(); e.target.reset(); toast('Guardado'); });
-    $('#form-gasto').addEventListener('submit',(e)=>{ e.preventDefault(); state.gastos.push({monto:$('#gas-monto').value, desc:$('#gas-desc').value, fecha:$('#gas-fecha').value}); persist(); renderGastos(); renderResumen(); e.target.reset(); toast('Guardado'); });
-    $('#form-servicio').addEventListener('submit',(e)=>{ e.preventDefault(); state.servicios.push({empresa:$('#serv-empresa').value, propiedad:$('#serv-propiedad').value, ciudad:$('#serv-ciudad').value, url:$('#serv-url').value}); persist(); renderServicios(); e.target.reset(); toast('Guardado'); });
-    $('#form-link').addEventListener('submit', (e) => { e.preventDefault(); const n=$('#link-nombre').value.trim(), u=$('#link-url').value.trim(); if(!n||!u)return; state.links.push({id:crypto.randomUUID(), nombre:n, url:u}); persist(); renderLinks(); e.target.reset(); toast('Enlace guardado'); });
-    $('#form-receta').addEventListener('submit', (e) => { e.preventDefault(); const n=$('#receta-nombre').value.trim(); if(!n)return; state.recetas.push({id:crypto.randomUUID(), nombre:n, ingredientes:$('#receta-ingredientes').value.trim(), instrucciones:$('#receta-instrucciones').value.trim()}); persist(); renderRecetas(); e.target.reset(); toast('Receta guardada'); });
+    $('#form-alquiler').addEventListener('submit',async (e)=>{ e.preventDefault(); const a={id: crypto.randomUUID(), propId:$('#alq-propiedad').value, mes:$('#alq-mes').value, monto:$('#alq-monto').value}; const idx=state.alquileres.findIndex(al=>al.propId===a.propId&&al.mes===a.mes); if(idx>=0){state.alquileres[idx]=a; toast('Actualizado');}else{state.alquileres.push(a); toast('Registrado');} await persist(); e.target.reset(); });
+    $('#form-ingreso').addEventListener('submit',async (e)=>{ e.preventDefault(); state.ingresos.push({id: crypto.randomUUID(), monto:$('#ing-monto').value, desc:$('#ing-desc').value, fecha:$('#ing-fecha').value}); await persist(); e.target.reset(); toast('Guardado'); });
+    $('#form-gasto').addEventListener('submit',async (e)=>{ e.preventDefault(); state.gastos.push({id: crypto.randomUUID(), monto:$('#gas-monto').value, desc:$('#gas-desc').value, fecha:$('#gas-fecha').value}); await persist(); e.target.reset(); toast('Guardado'); });
+    $('#form-servicio').addEventListener('submit',async (e)=>{ e.preventDefault(); state.servicios.push({id: crypto.randomUUID(), empresa:$('#serv-empresa').value, propiedad:$('#serv-propiedad').value, ciudad:$('#serv-ciudad').value, url:$('#serv-url').value}); await persist(); e.target.reset(); toast('Guardado'); });
+    $('#form-link').addEventListener('submit', async (e) => { e.preventDefault(); const n=$('#link-nombre').value.trim(), u=$('#link-url').value.trim(); if(!n||!u)return; state.links.push({id:crypto.randomUUID(), nombre:n, url:u}); await persist(); e.target.reset(); toast('Enlace guardado'); });
+    $('#form-receta').addEventListener('submit', async (e) => { e.preventDefault(); const n=$('#receta-nombre').value.trim(); if(!n)return; state.recetas.push({id:crypto.randomUUID(), nombre:n, ingredientes:$('#receta-ingredientes').value.trim(), instrucciones:$('#receta-instrucciones').value.trim()}); await persist(); e.target.reset(); toast('Receta guardada'); });
 
-    document.addEventListener('click',(e)=>{ 
+    document.addEventListener('click', async (e)=>{ 
       const b=e.target.closest('button'); if(!b||!b.dataset.type) return; 
       const t=b.dataset.type, i=Number(b.dataset.i);
       const deleteActions = { 
-        'prop-del': { list: 'propiedades', render: renderPropiedades, msg: 'Propiedad eliminada' }, 'alq-del': { list: 'alquileres', render: renderAlquileres, msg: 'Alquiler eliminado' },
-        'ing-del': { list: 'ingresos', render: renderIngresos, msg: 'Ingreso eliminado' }, 'gas-del': { list: 'gastos', render: renderGastos, msg: 'Gasto eliminado' },
-        'serv-del': { list: 'servicios', render: renderServicios, msg: 'Servicio eliminado' }, 'link-del': { list: 'links', render: renderLinks, msg: 'Enlace eliminado' },
-        'receta-del': { list: 'recetas', render: renderRecetas, msg: 'Receta eliminada' }
+        'prop-del': { list: 'propiedades', msg: 'Propiedad eliminada' }, 'alq-del': { list: 'alquileres', msg: 'Alquiler eliminado' },
+        'ing-del': { list: 'ingresos', msg: 'Ingreso eliminado' }, 'gas-del': { list: 'gastos', msg: 'Gasto eliminado' },
+        'serv-del': { list: 'servicios', msg: 'Servicio eliminado' }, 'link-del': { list: 'links', msg: 'Enlace eliminado' },
+        'receta-del': { list: 'recetas', msg: 'Receta eliminada' }
       };
-      if(deleteActions[t]){ const action = deleteActions[t]; state[action.list].splice(i,1); persist(); action.render(); renderResumen(); toast(action.msg); } 
+      if(deleteActions[t]){ const action = deleteActions[t]; state[action.list].splice(i,1); await persist(); toast(action.msg); } 
       else if(t==='prop-edit'){ startEditProp(i); }
-      else if (t === 'prop-dup') { const original = state.propiedades[i]; if(original){ const newProp = {...original, id: crypto.randomUUID(), nombre: original.nombre + ' - Copia'}; state.propiedades.splice(i + 1, 0, newProp); persist(); renderPropiedades(); startEditProp(i + 1); }}
+      else if (t === 'prop-dup') { const original = state.propiedades[i]; if(original){ const newProp = {...original, id: crypto.randomUUID(), nombre: original.nombre + ' - Copia'}; state.propiedades.splice(i + 1, 0, newProp); await persist(); startEditProp(i + 1); }}
       else if(t==='receta-view'){ const r=state.recetas[i]; const content=`<h3>Ingredientes:</h3><pre>${r.ingredientes||'N/A'}</pre><h3>Instrucciones:</h3><pre>${r.instrucciones||'N/A'}</pre>`; openModal(r.nombre, content); }
     });
+    
+    // ===== MIGRACIÓN DE DATOS LOCALES A FIREBASE =====
+    $('#migrate-btn').addEventListener('click', async () => {
+        if (!confirm('¿Quieres copiar tus datos guardados localmente a la nube (Firebase)? Esta acción solo se debe hacer una vez por dispositivo.')) return;
+        
+        const localDBKeys = {
+            'fin:props': 'propiedades', 'fin:ing': 'ingresos', 'fin:gas': 'gastos', 'fin:serv': 'servicios',
+            'fin:chat': 'chat', 'fin:alq': 'alquileres', 'app:links': 'links', 'app:recetas': 'recetas'
+        };
+        let migrated = false;
 
-    // ===== EXPORTAR/IMPORTAR =====
-    function exportData(){ const payload={ app:'JustPersonal', version:8, exportedAt:new Date().toISOString(), data:state }; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup_justpersonal_'+toYM(new Date().toISOString())+'.json'; a.click(); URL.revokeObjectURL(a.href); toast('Datos exportados'); }
-    async function importData(file){ try{ const text=await file.text(); const obj=JSON.parse(text); if(!obj||!obj.app||!obj.data) throw new Error('Archivo inválido'); initState(); Object.keys(obj.data).forEach(key => { if(state.hasOwnProperty(key)) state[key] = obj.data[key]; }); persist(); renderAll(); toast('Importación completa'); }catch(e){ console.error(e); toast(e.message); } }
-    $('#btn-export').addEventListener('click', exportData); $('#btn-import').addEventListener('click',()=>$('#file-import').click()); $('#file-import').addEventListener('change',(e)=>{ if(e.target.files?.[0]) importData(e.target.files[0]); e.target.value=''; });
+        Object.keys(localDBKeys).forEach(localKey => {
+            const stateKey = localDBKeys[localKey];
+            try {
+                const localData = JSON.parse(localStorage.getItem(localKey));
+                if (localData && Array.isArray(localData) && localData.length > 0) {
+                    const currentData = state[stateKey];
+                    let itemsAdded = 0;
+                    localData.forEach(item => {
+                        const uniqueId = item.id || JSON.stringify(item); // Simple unique check
+                        if (!currentData.some(existing => (existing.id || JSON.stringify(existing)) === uniqueId)) {
+                            currentData.push(item);
+                            itemsAdded++;
+                        }
+                    });
+                    if (itemsAdded > 0) migrated = true;
+                }
+            } catch (e) { console.error(`Error migrando ${localKey}`, e); }
+        });
 
+        if (migrated) {
+            await persist();
+            toast('¡Migración completada! Tus datos locales están en la nube.');
+        } else {
+            toast('No se encontraron datos locales nuevos para migrar.');
+        }
+        $('#migrate-btn').style.display = 'none'; // Ocultar después de usar
+    });
+    
     // ===== ASISTENTE VIRTUAL =====
     const chat={ panel:$('#chat-panel'), body:$('#chat-body'), input:$('#chat-input') };
-    function pushMsg(html, me=false){ const d=document.createElement('div'); d.className='msg'+(me?' me':''); d.innerHTML=html; chat.body.append(d); chat.body.scrollTop=chat.body.scrollHeight; if(state.chat.length > 50)state.chat.shift(); state.chat.push({me,html,ts:Date.now()}); persist(); }
+    async function pushMsg(html, me=false){ const d=document.createElement('div'); d.className='msg'+(me?' me':''); d.innerHTML=html; chat.body.append(d); chat.body.scrollTop=chat.body.scrollHeight; if(state.chat.length > 50)state.chat.shift(); state.chat.push({me,html,ts:Date.now()}); await persist(); }
     const toggleChat = (force) => chat.panel.classList.toggle('open', force);
-    $('#open-chat').addEventListener('click', () => toggleChat()); $('#btn-close-chat').addEventListener('click', () => toggleChat(false));
-    $('#btn-clear-chat').addEventListener('click', ()=>{ state.chat=[]; persist(); loadChatHistory(true); });
-    function showTyping() { const el = document.createElement('div'); el.className = 'msg typing'; el.id = 'typing-indicator'; el.textContent = 'Pensando...'; chat.body.appendChild(el); chat.body.scrollTop = chat.body.scrollHeight; }
-    function hideTyping() { const el = $('#typing-indicator'); if (el) el.remove(); }
-    
+    async function sendChat(){ const v=(chat.input.value||'').trim(); if(!v) return; await pushMsg(v,true); chat.input.value=''; await processAssistantQuery(v); }
     async function processAssistantQuery(query) {
         showTyping();
         const q = query.toLowerCase().trim();
-        const ym = toYM(new Date().toISOString());
-
-        // Primero, intentar responder con datos locales
         let response = '';
+
         if (q.includes('cuántas propiedades') || q.includes('numero de propiedades')) {
             const count = state.propiedades.length;
             response = `Tienes ${count} propiedades registradas.`;
         } else if (q.includes('propiedades') && state.propiedades.length > 0) {
             response = `Tienes ${state.propiedades.length} propiedades: <ul>` + state.propiedades.map(p => `<li>${p.nombre}</li>`).join('') + `</ul>`;
-        } else if (q.includes('ingreso total')) {
-            const total = state.ingresos.reduce((s, r) => s + Number(r.monto), 0) + state.alquileres.reduce((s, a) => s + Number(a.monto), 0);
-            response = `Tu ingreso total acumulado es de ${fmt(total)}.`;
-        } else if (q.includes('gasto total')) {
-            const total = state.gastos.reduce((s, r) => s + Number(r.monto), 0);
-            response = `Tu gasto total acumulado es de ${fmt(total)}.`;
-        } else if (q.includes('saldo')) {
-            const totalIngresos = state.ingresos.reduce((s, r) => s + Number(r.monto), 0) + state.alquileres.reduce((s, a) => s + Number(a.monto), 0);
-            const totalGastos = state.gastos.reduce((s, r) => s + Number(r.monto), 0);
-            response = `Tu saldo total acumulado (ingresos - gastos) es de ${fmt(totalIngresos - totalGastos)}.`;
         } else if (q.includes('resumen')) {
-            const ingM = state.ingresos.filter(r=>toYM(r.fecha)===ym).reduce((s, r) => s + Number(r.monto), 0);
-            const alqM = state.alquileres.filter(a=>a.mes===ym).reduce((s, r) => s + Number(r.monto), 0);
-            const gasM = state.gastos.filter(r=>toYM(r.fecha)===ym).reduce((s, r) => s + Number(r.monto), 0);
+            const ym = toYM(new Date().toISOString());
+            const sum = (list, filter, key) => list.filter(filter).reduce((s, r) => s + Number(r[key] || 0), 0);
+            const ingM = sum(state.ingresos, r => toYM(r.fecha) === ym, 'monto');
+            const alqM = sum(state.alquileres, a => a.mes === ym, 'monto');
+            const gasM = sum(state.gastos, r => toYM(r.fecha) === ym, 'monto');
             response = `📊 Resumen para ${ym}:<br>Ingresos: ${fmt(ingM + alqM)}<br>Gastos: ${fmt(gasM)}<br><b>Saldo: ${fmt((ingM + alqM) - gasM)}</b>`;
         }
 
         if (response) {
             hideTyping();
-            pushMsg(response);
+            await pushMsg(response);
             return;
         }
-
-        // Si no hay respuesta local, buscar en internet
-        await askInternet(query);
-    }
-
-    async function askInternet(q){ 
-        const stopWords = ['qué es', 'que es', 'dime', 'explica', 'háblame de', 'hablame de', 'define', 'buscar', 'busca', 'quien fue', 'quién fue', 'cuál es', 'cual es', 'buscar en internet'];
-        let searchTerm = q.toLowerCase().trim();
-        for (const word of stopWords) { if (searchTerm.startsWith(word + " ")) { searchTerm = searchTerm.substring(word.length).trim(); break; } }
         
-        if (!searchTerm) { hideTyping(); pushMsg("Por favor, sé más específico."); return; }
-
-        try {
-            let answer, url, source = '';
-            let res = await fetch(API_CONFIG.duckDuckGo(searchTerm));
-            if(res.ok){ let data = await res.json(); answer = data.AbstractText || data.Answer; url = data.AbstractURL; source = 'DuckDuckGo'; }
-            
-            if (!answer) {
-                res = await fetch(API_CONFIG.wikipediaSearch(searchTerm));
-                if(res.ok){ let data = await res.json(); const pageTitle = data[1]?.[0];
-                if(pageTitle) {
-                    res = await fetch(API_CONFIG.wikipediaSummary(pageTitle));
-                    if(res.ok){ let sData = await res.json(); answer = sData.extract; url = sData.content_urls?.desktop?.page; source = 'Wikipedia'; }
-                }}
-            }
-            hideTyping();
-            if (answer) { let html = `<strong>Respuesta para "${q}":</strong><br><br>${answer.replace(/\n/g, '<br>')}`; if (url) html += `<a href="${url}" target="_blank" rel="noopener" class="source-link">🔗 Fuente: ${source}</a>`; pushMsg(html);
-            } else { pushMsg(`🤔 No encontré información en línea sobre "<strong>${q}</strong>".`); }
-        } catch(e){ hideTyping(); console.error(e); pushMsg('❌ <strong>Error de conexión.</strong>'); } 
+        // Si no, buscar en internet...
+        hideTyping();
+        await pushMsg(`No encontré una respuesta en tus datos locales para "${query}". ¿Quieres que busque en internet?`, false);
     }
-
-    async function sendChat(){ const v=(chat.input.value||'').trim(); if(!v) return; pushMsg(v,true); chat.input.value=''; await processAssistantQuery(v); }
-    $('#chat-send').addEventListener('click', sendChat); chat.input.addEventListener('keydown', (e) => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendChat(); }});
-    $$('.chip').forEach(c => c.addEventListener('click',() => {
-        const query = c.dataset.chip;
-        processAssistantQuery(query);
-        pushMsg(query, true);
-    }));
-
+    
     function loadChatHistory(clearAndGreet = false) { 
         chat.body.innerHTML = ''; 
         if (clearAndGreet || !state.chat.length) { 
-            pushMsg('¡Hola! 👋 Soy tu asistente personal.<br><br>Puedes preguntarme sobre tus datos, por ejemplo:<br>- "¿Cuántas propiedades tengo?"<br>- "Resumen de finanzas"'); 
+             const welcomeMsg = '¡Hola! 👋 Soy tu asistente personal.<br><br>Puedes preguntarme sobre tus datos, por ejemplo:<br>- "¿Cuántas propiedades tengo?"<br>- "Resumen de finanzas"';
+             const d = document.createElement('div'); d.className = 'msg'; d.innerHTML = welcomeMsg; chat.body.append(d);
         } else { 
             state.chat.forEach(msg => { const d=document.createElement('div'); d.className='msg'+(msg.me?' me':''); d.innerHTML=msg.html; chat.body.append(d); }); 
         } 
         if(chat.body.scrollHeight > 0) chat.body.scrollTop=chat.body.scrollHeight; 
     }
-    
+
     // ===== INICIALIZACIÓN =====
-    function init() {
-        initState();
-        renderAll();
+    document.addEventListener('DOMContentLoaded', () => {
+        attachEventListeners();
+        
+        // Dark Mode Init
+        const doc = document.documentElement;
+        const storedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = storedTheme || (prefersDark ? 'dark' : 'light');
+        doc.setAttribute('data-theme', theme);
+        $('#theme-toggle').textContent = theme === 'dark' ? '☀️' : '🌙';
+
+        // Chat listeners
+        $('#open-chat').addEventListener('click', () => toggleChat());
+        $('#btn-close-chat').addEventListener('click', () => toggleChat(false));
+        $('#btn-clear-chat').addEventListener('click', async ()=>{ state.chat=[]; await persist(); loadChatHistory(true); });
+        $('#chat-send').addEventListener('click', sendChat); 
+        $('#chat-input').addEventListener('keydown', (e) => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendChat(); }});
+        $$('.chip').forEach(c => c.addEventListener('click',() => { const q = c.dataset.chip; $('#chat-input').value = q; sendChat(); }));
+
+        // Configuración de fechas iniciales
         const today = new Date().toISOString().slice(0,10);
         $('#res-mes').value = toYM(today); $('#alq-mes').value = toYM(today);
         $('#ing-fecha').value = today; $('#gas-fecha').value = today; $('#fecha-salud').value = today;
         $('#res-mes')?.addEventListener('change', renderResumen); 
         $('#btn-refrescar-resumen')?.addEventListener('click', renderResumen);
-        loadChatHistory();
-    }
-    document.addEventListener('DOMContentLoaded', init);
+    });
   </script>
 </body>
 </html>
