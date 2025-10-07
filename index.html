@@ -1,648 +1,417 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JustPersonal - Asistente Personal</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .view {
-            display: none;
-        }
-        .view.active {
-            display: block;
-            animation: fadeIn 0.5s;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
-        .modal.hidden .modal-content { transform: scale(0.95); opacity: 0; }
-        .modal .modal-content { transition: all 0.2s ease-in-out; }
-    </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>JustPersonal · Panel Principal</title>
+<style>
+    :root {
+        --bg: #f8fafc;
+        --panel: #ffffff;
+        --card: #ffffff;
+        --muted: #64748b;
+        --text: #0f172a;
+        --line: #e2e8f0;
+        --accent: #0ea5e9;
+        --accent-2: #22c55e;
+        --danger: #ef4444;
+        --shadow: 0 4px 12px rgba(2,6,23,.08);
+        --shadow-lg: 0 10px 30px rgba(2,6,23,.1);
+    }
+
+    html[data-theme="dark"] {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --card: #1e293b;
+        --muted: #94a3b8;
+        --text: #f1f5f9;
+        --line: #334155;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%; scroll-behavior: smooth;}
+    body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvetica Neue',Arial;color:var(--text); transition: background .2s, color .2s;}
+    h1,h2,h3{margin:0; line-height: 1.2;}
+    header.top{padding:16px 24px;border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:0;z-index:10; display:flex; justify-content:space-between; align-items:center;}
+    main{max-width:1200px;margin:32px auto;padding:0 24px;}
+    .full{grid-column:1/-1}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow); transition: transform .2s, box-shadow .2s;}
+    .card:hover{transform: translateY(-4px); box-shadow: var(--shadow-lg);}
+    .card header{position:initial;background:transparent;border:0;padding:20px 20px 0}
+    .card .content{padding:20px}
+    .row{display:flex;gap:8px;flex-wrap:wrap}
+    .col{display:flex;flex-direction:column;gap:8px}
+    .btn{appearance:none;border:1px solid var(--line);border-radius:10px;padding:10px 14px;color:var(--text);cursor:pointer;display:inline-flex;align-items:center;gap:8px;font-weight:600;background:var(--panel);transition:.15s}
+    .btn:hover{background:var(--bg); border-color: var(--accent);}
+    .btn.primary{border-color:var(--accent);color:var(--accent); background: transparent;}
+    .btn.primary:hover{background:var(--accent); color: white;}
+    .btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+    .btn.ghost:hover{color:var(--text); background: var(--bg);}
+    .grid{display:grid;gap:16px}
+    .grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .grid.three{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+    @media (max-width:900px){main{grid-template-columns:1fr; padding: 0 16px;}.grid.two,.grid.three{grid-template-columns:1fr}}
+    label{font-size:13px;color:var(--muted); font-weight: 500;}
+    input,select,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text)}
+    textarea{font-family: inherit; line-height: 1.5;}
+    input:focus, select:focus, textarea:focus {outline: 2px solid var(--accent); border-color: transparent;}
+    table{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line); border-radius: 12px; overflow: hidden;}
+    th,td{padding:12px 16px;border-bottom:1px solid var(--line);text-align:left;font-size:14px}
+    th{background:var(--bg)}
+    tr:last-child td {border-bottom: 0;}
+    tr:nth-child(even) {background-color: var(--bg);}
+
+    /* Tabs mejorados */
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;border-bottom: 1px solid var(--line); margin-bottom: 24px;}
+    .tab{padding:12px 16px;border-bottom: 2px solid transparent;background:transparent;color:var(--muted);cursor:pointer;user-select:none; font-weight: 600; margin-bottom: -1px;}
+    .tab:hover{color: var(--text);}
+    .tab[aria-selected="true"]{color:var(--accent); border-bottom-color: var(--accent);}
+    
+    .hidden{display:none !important}
+
+    /* Dashboard Grid */
+    .dashboard-grid {display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;}
+    .section-launcher {display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 24px; cursor: pointer; gap: 12px;}
+    .section-launcher span:first-child {font-size: 48px;}
+    .section-launcher span:last-child {font-size: 18px; font-weight: 600;}
+
+    /* KPI Cards */
+    .kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
+    .kpi .box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px; position: relative; padding-left: 60px;}
+    .kpi .icon {position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 28px; }
+    .kpi .title{font-size:14px;color:var(--muted)}
+    .kpi .value{font-weight:700;font-size:24px;margin-top:4px}
+    
+    /* Panel de sección */
+    .section-panel{position:fixed;top:50%;left:50%;transform:translate(-50%, -50%) scale(0.95); opacity: 0; width:90vw;height:90vh;max-width:1200px;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden;z-index:100;display:flex;flex-direction:column; pointer-events: none; transition: transform .3s, opacity .3s;}
+    .section-panel.open{transform:translate(-50%, -50%) scale(1); opacity: 1; pointer-events: all;}
+    .section-header{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;border-bottom:1px solid var(--line);background:var(--bg)}
+    .section-title{font-weight:700;font-size:18px}
+    .section-body{flex:1;overflow:auto;padding:24px}
+
+    /* Chat */
+    .chat-launcher{position:fixed;right:24px;bottom:24px;z-index:70}
+    .chat-bubble{position:fixed;right:24px;bottom:88px;width:380px;max-width:95vw;height:68vh;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden;z-index:70; transform: translateY(12px) scale(0.95); opacity: 0; transition: .3s; pointer-events: none;}
+    .chat-bubble.open{transform: translateY(0) scale(1); opacity: 1; pointer-events: all;}
+    .chat-header{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(--line);background:var(--bg)}
+    .chipbar{display:flex;gap:8px;overflow-x: auto; padding:12px;border-bottom:1px dashed var(--line)}
+    .chip{padding:6px 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);font-size:12px;cursor:pointer; white-space: nowrap;}
+    .chip:hover{background: var(--accent); color: white; border-color: var(--accent);}
+    .chat-body{flex:1;overflow:auto;padding:12px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+    .msg{max-width:84%;padding:10px 14px;border-radius:14px;border:1px solid var(--line);background:var(--panel); line-height: 1.5; word-wrap: break-word;}
+    .msg.me{align-self:flex-end;background:#dbeafe; color: #1e40af;}
+    html[data-theme="dark"] .msg.me{background: #3b82f6; color: white;}
+    .chat-footer{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line);background:var(--panel)}
+    .typing{font-size:12px;color:var(--muted);font-style:italic; align-self: flex-start;}
+    
+    /* Overlay y Modal */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99;opacity:0; transition: opacity .3s; pointer-events: none;}
+    .overlay.open{opacity:1; pointer-events: all;}
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:16px;z-index:110;opacity:0;transform:scale(0.95);transition:.3s;pointer-events:none;}
+    .modal.open{opacity:1;transform:scale(1);pointer-events:all;}
+    .modal .box{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);width:min(600px,95vw);max-height:80vh;display:flex;flex-direction:column;}
+    .modal .box header{padding:12px 16px;border-bottom:1px solid var(--line);font-weight:600;display:flex;justify-content:space-between;align-items:center;}
+    .modal .box .content{padding:16px;overflow:auto;line-height:1.6;}
+    .modal .box .content h3 {margin: 16px 0 8px 0;}
+    .modal .box .content pre {white-space:pre-wrap; font-family:inherit; background: var(--bg); padding: 12px; border-radius: 8px;}
+</style>
 </head>
-<body class="bg-slate-100 text-slate-800">
-
-    <div id="app" class="max-w-4xl mx-auto p-4 sm:p-6 md:p-8">
-
-        <!-- Header -->
-        <header class="mb-8 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <button id="back-to-home" class="hidden bg-white text-slate-600 w-10 h-10 rounded-full flex items-center justify-center shadow-sm border border-slate-200 hover:bg-slate-50 transition">
-                    <i class="fas fa-arrow-left"></i>
-                </button>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">JustPersonal</h1>
-            </div>
-            <p id="current-date" class="text-sm text-slate-500 font-medium"></p>
-        </header>
-
-        <!-- VISTA PRINCIPAL: MENÚ -->
-        <div id="home-view" class="view active">
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <button data-view="finance-view" class="menu-btn group bg-gradient-to-br from-indigo-500 to-blue-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
-                    <i class="fas fa-chart-pie text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                    <h2 class="text-xl font-bold">Temas Financieros</h2>
-                    <p class="text-sm opacity-80">Controla tus gastos, ingresos e inversiones.</p>
-                </button>
-                <button data-view="health-view" class="menu-btn group bg-gradient-to-br from-green-500 to-emerald-500 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
-                    <i class="fas fa-heart-pulse text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                    <h2 class="text-xl font-bold">Temas de Salud</h2>
-                    <p class="text-sm opacity-80">Gestiona citas, recordatorios y bienestar.</p>
-                </button>
-                <button data-view="social-view" class="menu-btn group bg-gradient-to-br from-sky-500 to-cyan-400 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
-                    <i class="fas fa-share-nodes text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                    <h2 class="text-xl font-bold">Redes Sociales</h2>
-                    <p class="text-sm opacity-80">Accede a tus perfiles rápidamente.</p>
-                </button>
-                <button data-view="ai-view" class="menu-btn group bg-gradient-to-br from-purple-600 to-violet-600 text-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow text-left">
-                    <i class="fas fa-brain text-3xl mb-4 opacity-70 group-hover:opacity-100 transition-opacity"></i>
-                    <h2 class="text-xl font-bold">Asistente de Relaciones</h2>
-                    <p class="text-sm opacity-80">Obtén una perspectiva sobre tu relación.</p>
-                </button>
-            </div>
-        </div>
-        
-        <!-- VISTA: FINANZAS -->
-        <div id="finance-view" class="view">
-            <div class="flex justify-between items-center mb-6">
-                 <h2 class="text-2xl font-bold">Finanzas Personales</h2>
-            </div>
-           
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Columna: Pagos de Servicios -->
-                <div class="lg:col-span-1 bg-white p-5 rounded-lg shadow-lg">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold">Pago de Servicios</h3>
-                        <button id="add-service-btn" class="bg-blue-100 text-blue-600 hover:bg-blue-200 transition rounded-full w-8 h-8 flex items-center justify-center">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    </div>
-                    <div id="services-list" class="space-y-3"></div>
-                </div>
-
-                <!-- Columna: Ingresos y Gastos -->
-                <div class="lg:col-span-2 space-y-6">
-                     <div class="bg-white p-5 rounded-lg shadow-lg">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold">Ingresos</h3>
-                            <button id="add-income-btn" class="bg-green-100 text-green-600 hover:bg-green-200 transition rounded-full w-8 h-8 flex items-center justify-center">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <div id="income-list" class="space-y-4"></div>
-                    </div>
-                     <div class="bg-white p-5 rounded-lg shadow-lg">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold">Gastos</h3>
-                            <button id="add-expense-btn" class="bg-red-100 text-red-600 hover:bg-red-200 transition rounded-full w-8 h-8 flex items-center justify-center">
-                                <i class="fas fa-plus"></i>
-                            </button>
-                        </div>
-                        <div id="expense-list" class="space-y-4"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <!-- VISTA: SALUD -->
-        <div id="health-view" class="view">
-            <h2 class="text-2xl font-bold mb-4">Salud</h2>
-             <p class="text-center text-slate-500 mt-10">Módulo en construcción.</p>
-        </div>
-
-        <!-- VISTA: REDES SOCIALES -->
-        <div id="social-view" class="view">
-            <h2 class="text-2xl font-bold mb-6">Redes Sociales</h2>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                <a href="https://facebook.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                    <i class="fab fa-facebook text-2xl text-blue-600"></i> <span class="font-semibold">Facebook</span>
-                </a>
-                <a href="https://instagram.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                    <i class="fab fa-instagram text-2xl text-pink-600"></i> <span class="font-semibold">Instagram</span>
-                </a>
-                <a href="https://x.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                    <i class="fab fa-twitter text-2xl text-sky-500"></i> <span class="font-semibold">X (Twitter)</span>
-                </a>
-                <a href="https://linkedin.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                    <i class="fab fa-linkedin text-2xl text-blue-700"></i> <span class="font-semibold">LinkedIn</span>
-                </a>
-                 <a href="https://tiktok.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                    <i class="fab fa-tiktok text-2xl text-black"></i> <span class="font-semibold">TikTok</span>
-                </a>
-                 <a href="https://youtube.com" target="_blank" class="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:bg-slate-50 transition">
-                    <i class="fab fa-youtube text-2xl text-red-600"></i> <span class="font-semibold">YouTube</span>
-                </a>
-            </div>
-        </div>
-
-        <!-- VISTA: ASISTENTE IA -->
-        <div id="ai-view" class="view">
-            <div id="ai-intro">
-                <h2 class="text-2xl font-bold mb-2">Asistente de Relaciones</h2>
-                <p class="text-slate-600 mb-6">Presiona el botón para que la IA genere un cuestionario único y divertido sobre tu relación. Tus respuestas son privadas y no se guardan.</p>
-                <button id="start-ai-test-btn" class="w-full bg-purple-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-purple-700 transition duration-300 flex items-center justify-center gap-2">
-                    <i class="fas fa-magic"></i> Generar Cuestionario
-                </button>
-            </div>
-
-            <div id="ai-test" class="hidden">
-                <div class="mb-6">
-                    <div class="w-full bg-slate-200 rounded-full h-2.5">
-                        <div id="progress-bar" class="bg-purple-600 h-2.5 rounded-full" style="width: 0%"></div>
-                    </div>
-                    <p id="progress-label" class="text-center text-sm text-slate-500 mt-2"></p>
-                </div>
-                <div id="question-container" class="bg-white p-6 rounded-lg shadow-lg">
-                    <h3 id="question-title" class="text-lg font-semibold mb-4"></h3>
-                    <textarea id="question-answer" rows="4" class="w-full p-3 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"></textarea>
-                    <div class="flex justify-between items-center mt-4">
-                        <button id="prev-question-btn" class="bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Anterior</button>
-                        <button id="next-question-btn" class="bg-purple-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-purple-700 transition">Siguiente</button>
-                    </div>
-                </div>
-                <div id="user-final-question-container" class="hidden mt-6">
-                     <h3 class="text-lg font-semibold mb-4 text-center">Finalmente, ¿qué pregunta del corazón le hacemos al asistente?</h3>
-                     <input type="text" id="user-final-question" placeholder="Ej: ¿Somos el uno para el otro? / ¿Nuestra locura combina?" class="w-full p-3 text-center border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500">
-                     <button id="get-ai-response-btn" class="mt-4 w-full bg-green-600 text-white font-semibold py-3 px-4 rounded-lg shadow-md hover:bg-green-700 transition duration-300">¡Consultar al Oráculo del Amor!</button>
-                </div>
-            </div>
-
-            <div id="ai-result" class="hidden">
-                <h2 class="text-2xl font-bold mb-4">Perspectiva del Asistente</h2>
-                <div id="ai-response-container" class="bg-white p-6 rounded-lg shadow-lg space-y-4 text-slate-700">
-                    <!-- AI response goes here -->
-                </div>
-                 <p class="text-xs text-slate-400 mt-4 text-center italic">Aviso: El asistente es muy simpático, pero esto no reemplaza el consejo de un profesional. Tómalo con humor y cariño.</p>
-                <button id="ai-reset-btn" class="mt-6 w-full bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Hacer otro análisis</button>
-            </div>
-        </div>
-
+<body>
+  <header class="top"><h1>JustPersonal · Panel Principal</h1><button class="btn ghost" id="theme-toggle" title="Cambiar tema">🌙</button></header>
+  
+  <main>
+    <div class="dashboard-grid">
+      <div class="card section-launcher" onclick="openSection('panel-finanzas')"><span>💰</span><span>Finanzas</span></div>
+      <div class="card section-launcher" onclick="openSection('panel-salud')"><span>🏥</span><span>Salud</span></div>
+      <div class="card section-launcher" onclick="openSection('panel-entretenimiento')"><span>🎮</span><span>Entretenimiento</span></div>
+      <div class="card section-launcher" onclick="openSection('panel-deportes')"><span>⚽</span><span>Deportes</span></div>
+      <div class="card section-launcher" onclick="openSection('panel-cocina')"><span>🍳</span><span>Cocina</span></div>
+      <div class="card section-launcher" onclick="openSection('panel-redes')"><span>📱</span><span>Redes Sociales</span></div>
     </div>
-    
-    <!-- MODALS -->
-    <div id="service-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 hidden z-50">
-        <div class="modal-content bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
-            <h2 class="text-xl font-bold mb-6">Agregar Servicio</h2>
-            <form id="service-form">
-                <div class="mb-4">
-                    <label for="service-name" class="block text-sm font-medium text-slate-700">Nombre de la Empresa</label>
-                    <input type="text" id="service-name" placeholder="Ej: Empresa de Energía" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
-                </div>
-                <div class="mb-4">
-                    <label for="service-property" class="block text-sm font-medium text-slate-700">Casa / Propiedad</label>
-                    <input type="text" id="service-property" placeholder="Ej: Edificio Central" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
-                </div>
-                <div class="grid grid-cols-2 gap-4 mb-4">
-                    <div>
-                        <label for="service-apt" class="block text-sm font-medium text-slate-700">Apartamento (Opcional)</label>
-                        <input type="text" id="service-apt" placeholder="Ej: 801" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm">
-                    </div>
-                    <div>
-                        <label for="service-city" class="block text-sm font-medium text-slate-700">Ciudad</label>
-                        <input type="text" id="service-city" placeholder="Ej: Bogotá" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
-                    </div>
-                </div>
-                <div class="mb-4">
-                    <label for="service-url" class="block text-sm font-medium text-slate-700">Página de Consulta (URL)</label>
-                    <input type="url" id="service-url" placeholder="https://..." class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
-                </div>
-                <div class="mb-4">
-                    <label for="service-ref" class="block text-sm font-medium text-slate-700">Número de Referencia</label>
-                    <input type="text" id="service-ref" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
-                </div>
-                <div class="flex justify-end gap-4 mt-6">
-                    <button type="button" class="cancel-btn bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg">Cancelar</button>
-                    <button type="submit" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg">Guardar</button>
-                </div>
-            </form>
-        </div>
+  </main>
+
+  <div class="overlay" id="panel-overlay" onclick="closeAll()"></div>
+  <div class="modal" id="modal"><div class="box"><header><span id="modal-title">Detalle</span><button class="btn ghost" id="modal-close">✖</button></header><div class="content" id="modal-content"></div></div></div>
+  
+  <div class="section-panel" id="panel-finanzas">
+    <div class="section-header"><div class="section-title">Finanzas</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-finanzas')" title="Cerrar">✖</button></div></div>
+    <div class="section-body">
+      <div aria-label="Gestión de Finanzas" class="tabs" role="tablist">
+        <button aria-controls="panel-resumen" aria-selected="true" class="tab" id="tab-resumen" role="tab">Resumen</button>
+        <button aria-controls="panel-propiedades" aria-selected="false" class="tab" id="tab-propiedades" role="tab">Propiedades</button>
+        <button aria-controls="panel-alquileres" aria-selected="false" class="tab" id="tab-alquileres" role="tab">Alquileres</button>
+        <button aria-controls="panel-ingresos" aria-selected="false" class="tab" id="tab-ingresos" role="tab">Otros Ingresos</button>
+        <button aria-controls="panel-gastos" aria-selected="false" class="tab" id="tab-gastos" role="tab">Gastos</button>
+        <button aria-controls="panel-servicios" aria-selected="false" class="tab" id="tab-servicios" role="tab">Servicios</button>
+      </div>
+      
+      <div id="panel-resumen" role="tabpanel">
+        <div class="row" style="align-items:end;gap:16px; margin-bottom: 24px;"><input id="res-mes" type="month"/> <button class="btn" id="btn-refrescar-resumen" type="button">Refrescar</button> <div class="row" style="margin-left:auto"> <button class="btn" id="btn-export" type="button">Exportar</button> <input accept="application/json" class="hidden" id="file-import" type="file"/> <button class="btn ghost" id="btn-import" type="button">Importar</button> </div></div>
+        <h3 style="margin-bottom: 12px;">Resumen del Mes</h3>
+        <div class="kpi"><div class="box"><span class="icon">📥</span><div class="title">Ingresos Mes</div><div class="value" id="kpi-ing-mes">$0</div></div> <div class="box"><span class="icon">🏠</span><div class="title">Alquiler Mes</div><div class="value" id="kpi-renta-mes">$0</div></div> <div class="box"><span class="icon">📤</span><div class="title">Gastos Mes</div><div class="value" id="kpi-gas-mes">$0</div></div> <div class="box"><span class="icon">💰</span><div class="title">Saldo Mes</div><div class="value" id="kpi-saldo-mes">$0</div></div></div>
+        <h3 style="margin: 24px 0 12px 0;">Acumulado Total</h3>
+        <div class="kpi"><div class="box"><span class="icon">📥</span><div class="title">Ingresos Acum</div><div class="value" id="kpi-ing-acum">$0</div></div> <div class="box"><span class="icon">🏠</span><div class="title">Alquiler Acum</div><div class="value" id="kpi-renta-acum">$0</div></div> <div class="box"><span class="icon">📤</span><div class="title">Gastos Acum</div><div class="value" id="kpi-gas-acum">$0</div></div> <div class="box"><span class="icon">💰</span><div class="title">Saldo Acum</div><div class="value" id="kpi-saldo-acum">$0</div></div></div>
+      </div>
+      
+      <div class="hidden" id="panel-propiedades" role="tabpanel">
+        <div class="card"><header><h2>Añadir/Editar Propiedad</h2></header><div class="content"><form autocomplete="off" class="grid two" id="form-propiedad"><input id="prop-id" type="hidden"/><div class="col"><label for="prop-nombre">Nombre Propiedad</label><input id="prop-nombre" required=""/></div><div class="col"><label for="prop-ciudad">Ciudad</label><input id="prop-ciudad" required=""/></div><div class="col"><label for="prop-arrendatario">Arrendatario</label><input id="prop-arrendatario" required=""/></div><div class="col"><label for="prop-alquiler">Alquiler ($)</label><input id="prop-alquiler" type="number"/></div><div class="row" style="align-items:end; grid-column: 1 / -1;"><button class="btn primary" type="submit">Guardar</button><button class="btn ghost" id="btn-cancelar-propiedad" type="reset">Limpiar</button></div></form></div></div>
+        <div class="card" style="margin-top:24px;"><header><h2>Propiedades Guardadas</h2></header><div class="content"><table id="tabla-propiedades"><thead><tr><th>Propiedad</th><th>Ciudad</th><th>Arrendatario</th><th>Alquiler</th><th>Acciones</th></tr></thead><tbody></tbody></table></div></div>
+      </div>
+
+      <div class="hidden" id="panel-alquileres" role="tabpanel">
+        <div class="card"><header><h2>Registrar Pago de Alquiler</h2></header><div class="content"><form autocomplete="off" class="grid three" id="form-alquiler"><div class="col"><label for="alq-propiedad">Propiedad</label><select id="alq-propiedad" required><option value="">Seleccionar</option></select></div><div class="col"><label for="alq-mes">Mes</label><input id="alq-mes" type="month" required/></div><div class="col"><label for="alq-monto">Monto Pagado</label><input id="alq-monto" type="number" required/></div><div class="row" style="align-items:end"><button class="btn primary" type="submit">Registrar</button><button class="btn ghost" type="reset">Limpiar</button></div></form></div></div>
+        <div class="card" style="margin-top:24px;"><header><h2>Historial de Pagos</h2></header><div class="content"><table id="tabla-alquileres"><thead><tr><th>Propiedad</th><th>Mes</th><th>Monto</th><th></th></tr></thead><tbody></tbody></table></div></div>
+      </div>
+
+      <div class="hidden" id="panel-ingresos" role="tabpanel">
+          <div class="card"><header><h2>Añadir Otro Ingreso</h2></header><div class="content"><form autocomplete="off" class="grid three" id="form-ingreso"><div class="col"><label for="ing-monto">Monto</label><input id="ing-monto" required="" type="number"/></div><div class="col"><label for="ing-desc">Descripción</label><input id="ing-desc"/></div><div class="col"><label for="ing-fecha">Fecha</label><input id="ing-fecha" required="" type="date"/></div><div class="row" style="align-items:end"><button class="btn primary" type="submit">Guardar</button><button class="btn ghost" type="reset">Limpiar</button></div></form></div></div>
+          <div class="card" style="margin-top:24px;"><header><h2>Ingresos Guardados</h2></header><div class="content"><table id="tabla-ingresos"><thead><tr><th>Fecha</th><th>Monto</th><th>Descripción</th><th></th></tr></thead><tbody></tbody></table></div></div>
+      </div>
+      
+      <div class="hidden" id="panel-gastos" role="tabpanel">
+        <div class="card"><header><h2>Añadir Gasto</h2></header><div class="content"><form autocomplete="off" class="grid three" id="form-gasto"><div class="col"><label for="gas-monto">Monto</label><input id="gas-monto" required="" type="number"/></div><div class="col"><label for="gas-desc">Descripción</label><input id="gas-desc"/></div><div class="col"><label for="gas-fecha">Fecha</label><input id="gas-fecha" required="" type="date"/></div><div class="row" style="align-items:end"><button class="btn primary" type="submit">Guardar</button><button class="btn ghost" type="reset">Limpiar</button></div></form></div></div>
+        <div class="card" style="margin-top:24px;"><header><h2>Gastos Guardados</h2></header><div class="content"><table id="tabla-gastos"><thead><tr><th>Fecha</th><th>Monto</th><th>Descripción</th><th></th></tr></thead><tbody></tbody></table></div></div>
+      </div>
+
+      <div class="hidden" id="panel-servicios" role="tabpanel">
+          <div class="card"><header><h2>Añadir Servicio</h2></header><div class="content"><form autocomplete="off" class="grid two" id="form-servicio"><div class="col"><label for="serv-empresa">Empresa</label><input id="serv-empresa" required=""/></div><div class="col"><label for="serv-propiedad">Propiedad</label><input id="serv-propiedad" required=""/></div><div class="col"><label for="serv-ciudad">Ciudad</label><input id="serv-ciudad"/></div><div class="col"><label for="serv-url">URL</label><input id="serv-url" type="url"/></div><div class="row" style="align-items:end"><button class="btn primary" type="submit">Guardar</button><button class="btn ghost" type="reset">Limpiar</button></div></form></div></div>
+          <div class="card" style="margin-top:24px;"><header><h2>Servicios Guardados</h2></header><div class="content"><table id="tabla-servicios"><thead><tr><th>Empresa</th><th>Propiedad</th><th>URL</th><th></th></tr></thead><tbody></tbody></table></div></div>
+      </div>
     </div>
-    
-     <div id="transaction-modal" class="modal fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center p-4 hidden z-50">
-        <div class="modal-content bg-white rounded-lg shadow-2xl p-8 w-full max-w-md">
-            <h2 id="transaction-modal-title" class="text-xl font-bold mb-6"></h2>
-            <form id="transaction-form">
-                <input type="hidden" id="transaction-type">
-                <div class="mb-4">
-                    <label for="transaction-amount" class="block text-sm font-medium text-slate-700">Monto</label>
-                    <input type="number" id="transaction-amount" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
-                </div>
-                 <div class="mb-4">
-                    <label for="transaction-source" class="block text-sm font-medium text-slate-700"></label>
-                    <input type="text" id="transaction-source" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
-                </div>
-                <div class="mb-4">
-                    <label for="transaction-date" class="block text-sm font-medium text-slate-700">Fecha</label>
-                    <input type="date" id="transaction-date" class="mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm" required>
-                </div>
-                <div class="flex justify-end gap-4 mt-6">
-                    <button type="button" class="cancel-btn bg-slate-200 text-slate-800 font-semibold py-2 px-4 rounded-lg">Cancelar</button>
-                    <button type="submit" id="transaction-submit-btn" class="text-white font-semibold py-2 px-4 rounded-lg">Guardar</button>
-                </div>
-            </form>
-        </div>
-    </div>
+  </div>
+  
+  <div class="section-panel" id="panel-salud"><div class="section-header"><div class="section-title">Salud</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-salud')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Registro de Salud</h2></header><div class="content"><div class="grid two"><div class="col"><label for="peso">Peso (kg)</label><input id="peso" type="number"/></div><div class="col"><label for="altura">Altura (cm)</label><input id="altura" type="number"/></div><div class="col"><label for="presion">Presión arterial</label><input id="presion"/></div><div class="col"><label for="fecha-salud">Fecha</label><input id="fecha-salud" type="date"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
+  <div class="section-panel" id="panel-entretenimiento"><div class="section-header"><div class="section-title">Entretenimiento</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-entretenimiento')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Añadir Contenido</h2></header><div class="content"><div class="grid two"><div class="col"><label for="tipo-contenido">Tipo</label><select id="tipo-contenido"><option value="pelicula">Película</option><option value="serie">Serie</option><option value="videojuego">Videojuego</option></select></div><div class="col"><label for="titulo">Título</label><input id="titulo"/></div><div class="col"><label for="estado">Estado</label><select id="estado"><option value="por-ver">Por ver</option><option value="viendo">Viendo</option><option value="visto">Visto</option></select></div><div class="col"><label for="calificacion">Calificación (1-5)</label><input id="calificacion" type="number" min="1" max="5"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
+  <div class="section-panel" id="panel-deportes"><div class="section-header"><div class="section-title">Deportes y Enlaces</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-deportes')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Añadir Enlace Favorito</h2></header><div class="content"><form autocomplete="off" class="grid two" id="form-link"><div class="col"><label for="link-nombre">Nombre del Sitio</label><input id="link-nombre" required=""/></div><div class="col"><label for="link-url">URL del Sitio</label><input id="link-url" required="" type="url"/></div><div class="row" style="align-items:end;"><button class="btn primary" type="submit">Guardar</button></div></form></div></div><div class="card" style="margin-top:24px"><header><h2>Enlaces Guardados</h2></header><div class="content"><table id="tabla-links"><thead><tr><th>Nombre</th><th>URL</th><th></th></tr></thead><tbody></tbody></table></div></div></div></div>
+  <div class="section-panel" id="panel-cocina"><div class="section-header"><div class="section-title">Mis Recetas</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-cocina')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Nueva Receta</h2></header><div class="content"><form autocomplete="off" class="grid" id="form-receta"><div class="col full"><label for="receta-nombre">Nombre</label><input id="receta-nombre" required=""/></div><div class="col"><label for="receta-ingredientes">Ingredientes</label><textarea id="receta-ingredientes" rows="5"></textarea></div><div class="col"><label for="receta-instrucciones">Instrucciones</label><textarea id="receta-instrucciones" rows="5"></textarea></div><div class="row"><button class="btn primary" type="submit">Guardar</button></div></form></div></div><div class="card" style="margin-top:24px"><header><h2>Recetas Guardadas</h2></header><div class="content"><table id="tabla-recetas"><thead><tr><th>Nombre</th><th>Acciones</th></tr></thead><tbody></tbody></table></div></div></div></div>
+  <div class="section-panel" id="panel-redes"><div class="section-header"><div class="section-title">Redes Sociales</div><div class="section-actions"><button class="btn ghost" onclick="closeSection('panel-redes')" title="Cerrar">✖</button></div></div><div class="section-body"><div class="card"><header><h2>Mis Perfiles</h2></header><div class="content"><div class="grid two"><div class="col"><label for="red-social">Red Social</label><select id="red-social"><option value="facebook">Facebook</option><option value="twitter">Twitter</option><option value="instagram">Instagram</option></select></div><div class="col"><label for="usuario">Usuario</label><input id="usuario"/></div></div><div style="margin-top:20px"><button class="btn primary">Guardar</button></div></div></div></div></div>
+  
+  <div class="chat-launcher"><button class="btn primary" id="open-chat" title="Asistente">💬</button></div>
+  <aside class="chat-bubble" id="chat-panel"><div class="chat-header"><div class="chat-title">Asistente Virtual</div><div class="chat-actions"><button class="btn ghost" id="btn-clear-chat" title="Borrar">🗑️</button><button class="btn ghost" id="btn-close-chat" title="Cerrar">✖</button></div></div><div class="chipbar"><span class="chip" data-chip="resumen">📊 Resumen Financiero</span><span class="chip" data-chip="propiedades">🏠 Mis Propiedades</span></div><div class="chat-body" id="chat-body"></div><div class="chat-footer"><input id="chat-input" placeholder="Pregunta algo..."/><button class="btn primary" id="chat-send">Enviar</button></div></aside>
+  <div class="toast" id="toast"></div>
 
+  <script>
+    // ===== CONFIGURACIÓN =====
+    const API_CONFIG = {
+        duckDuckGo: (query) => `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json&no_html=1&skip_disambig=1&t=justpersonalapp`,
+        wikipediaSearch: (query) => `https://es.wikipedia.org/w/api.php?action=opensearch&search=${encodeURIComponent(query)}&limit=1&namespace=0&format=json&origin=*`,
+        wikipediaSummary: (title) => `https://es.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
+    };
+    const DB={ props:'fin:props', ing:'fin:ing', gas:'fin:gas', serv:'fin:serv', chat:'fin:chat', alq:'fin:alq', links: 'app:links', recetas: 'app:recetas' };
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    // ===== UTILIDADES =====
+    const $=(s,r=document)=>r.querySelector(s); 
+    const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+    const toast=(m)=>{const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500)};
+    const storage={ get:(k,f)=>{try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}}, set:(k,v)=>localStorage.setItem(k,JSON.stringify(v)) };
+    const fmt=(n)=> new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP',maximumFractionDigits:0}).format(Number(n||0));
+    const toYM=d=>(d||'').slice(0,7); 
 
-        // --- AGREGA TU API KEY DE GOOGLE AI STUDIO AQUÍ ---
-        const GEMINI_API_KEY = "AIzaSyBLhjMoZVyn3MjRgckcmW9Vavf9bR9Yx70";
-
-        const views = document.querySelectorAll('.view');
-        const menuButtons = document.querySelectorAll('.menu-btn');
-        const backButton = document.getElementById('back-to-home');
-        const currentDateEl = document.getElementById('current-date');
-
-        // State
-        let currentView = 'home-view';
-        let financeData = {
-            services: [],
-            incomes: [],
-            expenses: []
+    // ===== ESTADO =====
+    let state={};
+    function initState(){
+        state = { 
+            propiedades:storage.get(DB.props,[]), ingresos:storage.get(DB.ing,[]), gastos:storage.get(DB.gas,[]), 
+            servicios:storage.get(DB.serv,[]), chat:storage.get(DB.chat,[]), alquileres:storage.get(DB.alq,[]),
+            links: storage.get(DB.links, []), recetas: storage.get(DB.recetas, [])
         };
+    }
+    const persist=()=>{ 
+        storage.set(DB.props, state.propiedades); storage.set(DB.ing, state.ingresos); storage.set(DB.gas, state.gastos);
+        storage.set(DB.serv, state.servicios); storage.set(DB.chat, state.chat); storage.set(DB.alq, state.alquileres);
+        storage.set(DB.links, state.links); storage.set(DB.recetas, state.recetas);
+    };
 
-        // --- DATA PERSISTENCE (LocalStorage) ---
-        const saveData = () => {
-            localStorage.setItem('justPersonalFinance', JSON.stringify(financeData));
-        };
-        const loadData = () => {
-            const data = localStorage.getItem('justPersonalFinance');
-            if(data) {
-                financeData = JSON.parse(data);
-            }
-        };
+    // ===== UI (PANELES, MODALES, TABS, DARK MODE) =====
+    (function() {
+      const btn = $('#theme-toggle'); const storedTheme = storage.get('theme'); const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; const doc = document.documentElement;
+      const applyTheme = (theme) => { doc.setAttribute('data-theme', theme); btn.textContent = theme === 'dark' ? '☀️' : '🌙'; };
+      btn.addEventListener('click', () => { const newTheme = doc.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'; storage.set('theme', newTheme); applyTheme(newTheme); });
+      applyTheme(storedTheme || (prefersDark ? 'dark' : 'light'));
+    })();
+    const modal = $('#modal'); const overlay = $('#panel-overlay');
+    function openSection(id) { overlay.classList.add('open'); $(`#${id}`).classList.add('open'); }
+    function closeSection(id) { $(`#${id}`).classList.remove('open'); if (!$$('.section-panel.open').length) overlay.classList.remove('open');}
+    function openModal(title, content) { $('#modal-title').textContent = title; $('#modal-content').innerHTML = content; overlay.classList.add('open'); modal.classList.add('open'); }
+    function closeModal() { modal.classList.remove('open'); if (!$$('.section-panel.open').length) overlay.classList.remove('open'); }
+    function closeAll() { $$('.section-panel.open').forEach(p => p.classList.remove('open')); closeModal(); }
+    $('#modal-close').addEventListener('click', closeModal);
+    (function(){ 
+      const tabsContainer = $('#panel-finanzas');
+      if (!tabsContainer) return;
+      const tabs=$$('.tab', tabsContainer); 
+      const panels=$$('div[id^="panel-"]', tabsContainer);
+      window.selectFinanceTab=(id)=>{ 
+          tabs.forEach(t=>t.setAttribute('aria-selected',t.id === 'tab-'+id)); 
+          panels.forEach(p=>p.classList.toggle('hidden', p.id !== 'panel-'+id)); 
+      }; 
+      tabs.forEach(t=> t.addEventListener('click',()=> window.selectFinanceTab(t.id.replace('tab-','')))); 
+    })();
 
-        // --- NAVIGATION ---
-        const navigateTo = (viewId) => {
-            currentView = viewId;
-            views.forEach(v => v.classList.remove('active'));
-            document.getElementById(viewId).classList.add('active');
-            backButton.classList.toggle('hidden', viewId === 'home-view');
+    // ===== RENDERIZADO =====
+    function renderAll() {
+        renderPropiedades(); renderAlquileres(); renderIngresos(); renderGastos(); 
+        renderServicios(); renderLinks(); renderRecetas(); renderResumen();
+    }
+    function renderLinks() { const tb = $('#tabla-links tbody'); tb.innerHTML = ''; state.links.forEach((link, i) => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${link.nombre}</td><td><a href="${link.url}" target="_blank" rel="noopener noreferrer">${link.url}</a></td><td><button class="btn ghost" data-type="link-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderRecetas() { const tb = $('#tabla-recetas tbody'); tb.innerHTML = ''; state.recetas.forEach((receta, i) => { const tr = document.createElement('tr'); tr.innerHTML = `<td>${receta.nombre}</td><td class="row"><button class="btn ghost" data-type="receta-view" data-i="${i}">Ver</button><button class="btn ghost" data-type="receta-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderPropiedades(){ const tb=$('#tabla-propiedades tbody'); tb.innerHTML=''; state.propiedades.forEach((p,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${p.nombre}</td><td>${p.ciudad}</td><td>${p.arrendatario}</td><td>${fmt(p.alquiler||0)}</td><td class="row"><button class="btn ghost" data-type="prop-edit" data-i="${i}">Editar</button><button class="btn ghost" data-type="prop-dup" data-i="${i}">Duplicar</button><button class="btn ghost" data-type="prop-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); renderComboProps(); }
+    function renderAlquileres(){ const tb=$('#tabla-alquileres tbody'); tb.innerHTML=''; state.alquileres.forEach((a,i)=>{ const prop = state.propiedades.find(p=>p.id===a.propId); const tr=document.createElement('tr'); tr.innerHTML=`<td>${prop?.nombre || 'N/A'}</td><td>${a.mes}</td><td>${fmt(a.monto)}</td><td><button class="btn ghost" data-type="alq-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderIngresos(){ const tb=$('#tabla-ingresos tbody'); tb.innerHTML=''; state.ingresos.forEach((r,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.fecha}</td><td>${fmt(r.monto)}</td><td>${r.desc||''}</td><td><button class="btn ghost" data-type="ing-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderGastos(){ const tb=$('#tabla-gastos tbody'); tb.innerHTML=''; state.gastos.forEach((r,i)=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td>${r.fecha}</td><td>${fmt(r.monto)}</td><td>${r.desc||''}</td><td><button class="btn ghost" data-type="gas-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderServicios(){ const tb=$('#tabla-servicios tbody'); tb.innerHTML=''; state.servicios.forEach((s,i)=>{ const link=s.url?`<a href="${s.url}" target="_blank" rel="noopener">abrir</a>`:''; const tr=document.createElement('tr'); tr.innerHTML=`<td>${s.empresa}</td><td>${s.propiedad}</td><td>${link}</td><td><button class="btn ghost" data-type="serv-del" data-i="${i}">Eliminar</button></td>`; tb.append(tr); }); }
+    function renderComboProps(){ const sel=$('#alq-propiedad'); if(!sel) return; const keep=sel.value; sel.innerHTML='<option value="">Seleccionar</option>'; state.propiedades.forEach(p=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.nombre; sel.append(o); }); if(keep) sel.value=keep; }
+    function renderResumen(){ const ym=$('#res-mes')?.value||toYM(new Date().toISOString()); if($('#res-mes')) $('#res-mes').value=ym; const sum = (list, filter, key) => list.filter(filter).reduce((s, r) => s + Number(r[key] || 0), 0); const ingM=sum(state.ingresos, r=>toYM(r.fecha)===ym, 'monto'), gasM=sum(state.gastos, r=>toYM(r.fecha)===ym, 'monto'), alqM=sum(state.alquileres, a=>a.mes===ym, 'monto'); const ingA=sum(state.ingresos, ()=>true, 'monto'), gasA=sum(state.gastos, ()=>true, 'monto'), alqA=sum(state.alquileres, ()=>true, 'monto'); const set=(id,v)=>{const el=document.getElementById(id); if(el) el.textContent=fmt(v);}; set('kpi-ing-mes',ingM); set('kpi-renta-mes',alqM); set('kpi-gas-mes',gasM); set('kpi-saldo-mes', (ingM+alqM)-gasM); set('kpi-ing-acum',ingA); set('kpi-renta-acum',alqA); set('kpi-gas-acum',gasA); set('kpi-saldo-acum', (ingA+alqA)-gasA); }
 
-            if(viewId === 'finance-view') {
-                renderFinanceView();
-            }
-        };
+    // ===== FORMULARIOS Y ACCIONES =====
+    let editingPropIndex=null;
+    function startEditProp(index) {
+        editingPropIndex = index;
+        const p = state.propiedades[index];
+        if (!p) return;
+        $('#prop-id').value = p.id;
+        $('#prop-nombre').value = p.nombre;
+        $('#prop-ciudad').value = p.ciudad;
+        $('#prop-arrendatario').value = p.arrendatario;
+        $('#prop-alquiler').value = p.alquiler;
+        openSection('panel-finanzas');
+        window.selectFinanceTab('propiedades');
+        $('#form-propiedad').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        toast('Editando propiedad...');
+    }
+    $('#form-propiedad').addEventListener('submit', (e)=>{ e.preventDefault(); const id=$('#prop-id').value||crypto.randomUUID(); const data={id, nombre:$('#prop-nombre').value, ciudad:$('#prop-ciudad').value, arrendatario:$('#prop-arrendatario').value, alquiler:$('#prop-alquiler').value}; if(editingPropIndex!==null){state.propiedades[editingPropIndex]=data; toast('Actualizado');}else{state.propiedades.push(data); toast('Creado');} persist(); renderPropiedades(); renderResumen(); editingPropIndex=null; e.target.reset();});
+    $('#btn-cancelar-propiedad').addEventListener('click', () => { editingPropIndex = null; });
+    $('#form-alquiler').addEventListener('submit',(e)=>{ e.preventDefault(); const a={propId:$('#alq-propiedad').value, mes:$('#alq-mes').value, monto:$('#alq-monto').value}; const idx=state.alquileres.findIndex(al=>al.propId===a.propId&&al.mes===a.mes); if(idx>=0){state.alquileres[idx]=a; toast('Actualizado');}else{state.alquileres.push(a); toast('Registrado');} persist(); renderAlquileres(); renderResumen(); e.target.reset(); });
+    $('#form-ingreso').addEventListener('submit',(e)=>{ e.preventDefault(); state.ingresos.push({monto:$('#ing-monto').value, desc:$('#ing-desc').value, fecha:$('#ing-fecha').value}); persist(); renderIngresos(); renderResumen(); e.target.reset(); toast('Guardado'); });
+    $('#form-gasto').addEventListener('submit',(e)=>{ e.preventDefault(); state.gastos.push({monto:$('#gas-monto').value, desc:$('#gas-desc').value, fecha:$('#gas-fecha').value}); persist(); renderGastos(); renderResumen(); e.target.reset(); toast('Guardado'); });
+    $('#form-servicio').addEventListener('submit',(e)=>{ e.preventDefault(); state.servicios.push({empresa:$('#serv-empresa').value, propiedad:$('#serv-propiedad').value, ciudad:$('#serv-ciudad').value, url:$('#serv-url').value}); persist(); renderServicios(); e.target.reset(); toast('Guardado'); });
+    $('#form-link').addEventListener('submit', (e) => { e.preventDefault(); const n=$('#link-nombre').value.trim(), u=$('#link-url').value.trim(); if(!n||!u)return; state.links.push({id:crypto.randomUUID(), nombre:n, url:u}); persist(); renderLinks(); e.target.reset(); toast('Enlace guardado'); });
+    $('#form-receta').addEventListener('submit', (e) => { e.preventDefault(); const n=$('#receta-nombre').value.trim(); if(!n)return; state.recetas.push({id:crypto.randomUUID(), nombre:n, ingredientes:$('#receta-ingredientes').value.trim(), instrucciones:$('#receta-instrucciones').value.trim()}); persist(); renderRecetas(); e.target.reset(); toast('Receta guardada'); });
 
-        menuButtons.forEach(btn => {
-            btn.addEventListener('click', () => navigateTo(btn.dataset.view));
-        });
-
-        backButton.addEventListener('click', () => navigateTo('home-view'));
-
-        currentDateEl.textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-        
-        // --- FINANCE MODULE ---
-        const serviceModal = document.getElementById('service-modal');
-        const transactionModal = document.getElementById('transaction-modal');
-
-        const openModal = (modal) => modal.classList.remove('hidden');
-        const closeModal = (modal) => modal.classList.add('hidden');
-        
-        document.getElementById('add-service-btn').addEventListener('click', () => openModal(serviceModal));
-        document.getElementById('add-income-btn').addEventListener('click', () => openTransactionModal('income'));
-        document.getElementById('add-expense-btn').addEventListener('click', () => openTransactionModal('expense'));
-
-        document.querySelectorAll('.cancel-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                closeModal(serviceModal);
-                closeModal(transactionModal);
-            });
-        });
-
-        const formatCurrency = (amount) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'COP', minimumFractionDigits: 0 }).format(amount);
-        const getMonthYear = (dateString) => new Date(dateString + 'T00:00:00').toLocaleString('es-ES', { month: 'long', year: 'numeric' }).replace(/^\w/, c => c.toUpperCase());
-
-        // Services Logic
-        const renderServices = () => {
-            const list = document.getElementById('services-list');
-            list.innerHTML = '';
-            if(!financeData.services || financeData.services.length === 0){
-                list.innerHTML = `<p class="text-sm text-center text-slate-400">Agrega tus servicios.</p>`;
-                return;
-            }
-            financeData.services.forEach((service, index) => {
-                const serviceEl = document.createElement('div');
-                serviceEl.className = 'p-3 bg-slate-50 rounded-lg flex items-center justify-between';
-                
-                let location = `${service.property}, ${service.city}`;
-                if (service.apt) {
-                    location = `${service.property}, Apt ${service.apt}, ${service.city}`;
-                }
-
-                serviceEl.innerHTML = `
-                    <div>
-                        <p class="font-bold">${service.name}</p>
-                        <p class="text-xs text-slate-500">${location}</p>
-                        <p class="text-xs text-slate-500 mt-1">Ref: <strong>${service.ref}</strong></p>
-                    </div>
-                    <div class="flex items-center gap-2">
-                         <a href="${service.url.includes('?') ? service.url + service.ref : service.url + '?ref=' + service.ref}" target="_blank" class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:bg-blue-600 transition" title="Ir a Pagar">
-                            <i class="fas fa-external-link-alt"></i>
-                        </a>
-                        <button class="delete-service-btn text-slate-400 hover:text-red-500 transition" data-index="${index}" title="Eliminar">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </div>
-                `;
-                list.appendChild(serviceEl);
-            });
-        };
-        
-        document.getElementById('service-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (!financeData.services) financeData.services = [];
-            financeData.services.push({
-                name: document.getElementById('service-name').value,
-                property: document.getElementById('service-property').value,
-                apt: document.getElementById('service-apt').value,
-                city: document.getElementById('service-city').value,
-                url: document.getElementById('service-url').value,
-                ref: document.getElementById('service-ref').value
-            });
-            saveData();
-            renderServices();
-            closeModal(serviceModal);
-            e.target.reset();
-        });
-
-        document.getElementById('services-list').addEventListener('click', (e) => {
-            if(e.target.closest('.delete-service-btn')) {
-                const index = e.target.closest('.delete-service-btn').dataset.index;
-                financeData.services.splice(index, 1);
-                saveData();
-                renderServices();
-            }
-        });
-
-        // Transaction Logic
-        const openTransactionModal = (type) => {
-            const form = document.getElementById('transaction-form');
-            form.reset();
-            form.querySelector('#transaction-type').value = type;
-            const title = document.getElementById('transaction-modal-title');
-            const sourceLabel = form.querySelector('label[for="transaction-source"]');
-            const submitBtn = document.getElementById('transaction-submit-btn');
-
-            if(type === 'income') {
-                title.textContent = "Agregar Ingreso";
-                sourceLabel.textContent = "Fuente";
-                submitBtn.className = "bg-green-600 text-white font-semibold py-2 px-4 rounded-lg";
-            } else {
-                 title.textContent = "Agregar Gasto";
-                 sourceLabel.textContent = "Categoría";
-                 submitBtn.className = "bg-red-600 text-white font-semibold py-2 px-4 rounded-lg";
-            }
-            openModal(transactionModal);
-        };
-
-        document.getElementById('transaction-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const type = document.getElementById('transaction-type').value;
-            const transaction = {
-                id: Date.now(),
-                amount: parseFloat(document.getElementById('transaction-amount').value),
-                source: document.getElementById('transaction-source').value,
-                date: document.getElementById('transaction-date').value
-            };
-            
-            if(type === 'income') {
-                if (!financeData.incomes) financeData.incomes = [];
-                financeData.incomes.push(transaction);
-            } else {
-                if (!financeData.expenses) financeData.expenses = [];
-                financeData.expenses.push(transaction);
-            }
-            saveData();
-            renderTransactions(type === 'income' ? 'incomes' : 'expenses', type === 'income' ? 'income-list' : 'expense-list');
-            closeModal(transactionModal);
-        });
-
-        const renderTransactions = (type, listId) => {
-            const list = document.getElementById(listId);
-            list.innerHTML = '';
-            const data = financeData[type];
-            
-            if(!data || data.length === 0){
-                list.innerHTML = `<p class="text-sm text-center text-slate-400">No hay registros.</p>`;
-                return;
-            }
-            
-            const grouped = data.reduce((acc, item) => {
-                const month = getMonthYear(item.date);
-                if(!acc[month]) acc[month] = [];
-                acc[month].push(item);
-                return acc;
-            }, {});
-
-            Object.keys(grouped).sort((a,b) => new Date(b) - new Date(a)).forEach(month => {
-                const monthContainer = document.createElement('div');
-                let total = 0;
-                const itemsHtml = grouped[month].map(item => {
-                    total += item.amount;
-                    return `
-                        <div class="flex justify-between items-center text-sm py-1">
-                            <span>${item.source} <span class="text-xs text-slate-400">(${new Date(item.date+'T00:00:00').toLocaleDateString('es-ES', {day:'2-digit', month:'2-digit'})})</span></span>
-                            <span class="font-semibold">${formatCurrency(item.amount)}</span>
-                        </div>
-                    `;
-                }).join('');
-
-                monthContainer.innerHTML = `
-                    <div class="bg-slate-50 p-3 rounded-lg">
-                        <div class="flex justify-between items-center font-bold mb-2">
-                            <span>${month}</span>
-                            <span>${formatCurrency(total)}</span>
-                        </div>
-                        <div class="space-y-1">${itemsHtml}</div>
-                    </div>
-                `;
-                list.appendChild(monthContainer);
-            });
-        };
-        
-        const renderFinanceView = () => {
-            renderServices();
-            renderTransactions('incomes', 'income-list');
-            renderTransactions('expenses', 'expense-list');
-        };
-
-        // --- AI ASSISTANT LOGIC ---
-        const aiIntro = document.getElementById('ai-intro');
-        const aiTest = document.getElementById('ai-test');
-        const aiResult = document.getElementById('ai-result');
-        const startTestBtn = document.getElementById('start-ai-test-btn');
-        const nextQuestionBtn = document.getElementById('next-question-btn');
-        const prevQuestionBtn = document.getElementById('prev-question-btn');
-        const getAiResponseBtn = document.getElementById('get-ai-response-btn');
-        const aiResetBtn = document.getElementById('ai-reset-btn');
-        
-        const questionTitle = document.getElementById('question-title');
-        const questionAnswer = document.getElementById('question-answer');
-        const progressBar = document.getElementById('progress-bar');
-        const progressLabel = document.getElementById('progress-label');
-        const userFinalQuestionContainer = document.getElementById('user-final-question-container');
-        const userFinalQuestionInput = document.getElementById('user-final-question');
-
-        let questions = [];
-        let currentQuestionIndex = 0;
-        let answers = [];
-
-        const startTest = async () => {
-            startTestBtn.disabled = true;
-            startTestBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Generando preguntas...`;
-
-            try {
-                const generatedQuestions = await generateAiQuestions();
-                questions = generatedQuestions;
-                answers = new Array(questions.length).fill('');
-                
-                aiIntro.classList.add('hidden');
-                aiTest.classList.remove('hidden');
-                aiResult.classList.add('hidden');
-                currentQuestionIndex = 0;
-                userFinalQuestionContainer.classList.add('hidden');
-                document.getElementById('question-container').classList.remove('hidden');
-                displayQuestion();
-
-            } catch (error) {
-                alert("No se pudieron generar las preguntas. Revisa tu API Key o intenta más tarde.");
-            } finally {
-                startTestBtn.disabled = false;
-                startTestBtn.innerHTML = `<i class="fas fa-magic"></i> Generar Cuestionario`;
-            }
-        };
-        
-        const generateAiQuestions = async () => {
-            const prompt = "Eres un consejero de relaciones divertido y creativo. Genera una lista de 5 preguntas únicas, jocosas y amigables para que un usuario reflexione sobre su relación de pareja. Las preguntas deben estar en español. Devuelve el resultado como un array JSON de strings. Por ejemplo: [\"pregunta 1\", \"pregunta 2\", ...]";
-            
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
-            const payload = {
-                contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "ARRAY",
-                        items: { "type": "STRING" }
-                    }
-                }
-            };
-
-            const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-            if (!response.ok) throw new Error("API call failed");
-            const result = await response.json();
-            const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
-            return JSON.parse(jsonText);
-        };
-
-        const displayQuestion = () => {
-            questionTitle.textContent = questions[currentQuestionIndex];
-            questionAnswer.value = answers[currentQuestionIndex];
-            updateProgress();
-            
-            prevQuestionBtn.disabled = currentQuestionIndex === 0;
-            nextQuestionBtn.textContent = currentQuestionIndex === questions.length - 1 ? 'Finalizar' : 'Siguiente';
-        };
-
-        const updateProgress = () => {
-             const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-             progressBar.style.width = `${progress}%`;
-             progressLabel.textContent = `Pregunta ${currentQuestionIndex + 1} de ${questions.length}`;
-        };
-
-        const nextQuestion = () => {
-            answers[currentQuestionIndex] = questionAnswer.value;
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                displayQuestion();
-            } else {
-                document.getElementById('question-container').classList.add('hidden');
-                userFinalQuestionContainer.classList.remove('hidden');
-            }
-        };
-
-        const prevQuestion = () => {
-             if (currentQuestionIndex > 0) {
-                 answers[currentQuestionIndex] = questionAnswer.value;
-                 currentQuestionIndex--;
-                 displayQuestion();
-             }
-        };
-
-        const getAiResponse = async () => {
-            if (GEMINI_API_KEY === "PEGA_TU_API_KEY_AQUÍ") {
-                const responseContainer = document.getElementById('ai-response-container');
-                responseContainer.innerHTML = `<p class='text-red-500 font-semibold'>Error de Configuración: Debes agregar tu API Key de Google AI Studio en el archivo HTML para que el asistente funcione.</p>`;
-                aiTest.classList.add('hidden');
-                aiResult.classList.remove('hidden');
-                return;
-            }
-            aiTest.classList.add('hidden');
-            aiResult.classList.remove('hidden');
-            const responseContainer = document.getElementById('ai-response-container');
-            responseContainer.innerHTML = `<div class="text-center"><i class="fas fa-spinner fa-spin text-3xl text-purple-600"></i><p class="mt-3 text-slate-500">El asistente está analizando tus respuestas...</p></div>`;
-            const userFinalQuestion = userFinalQuestionInput.value || "¿Cuál es la perspectiva general de mi relación?";
-            const systemPrompt = "Eres un asistente de relaciones con un gran sentido del humor, muy amigable y un poco pícaro. Tu objetivo es dar una perspectiva divertida y positiva sobre la relación del usuario. Usa un tono jocoso y amable, como si fueras un buen amigo dando un consejo con una sonrisa. Analiza las respuestas para encontrar los puntos fuertes y las dinámicas divertidas. Puedes usar metáforas graciosas o comparaciones inesperadas. Al final, siempre da un mensaje optimista y cálido. No des respuestas definitivas ni predicciones, solo ofrece una perspectiva para hacer sonreír al usuario y ayudarle a reflexionar de forma ligera.";
-            let userPrompt = `Basado en las siguientes respuestas sobre mi relación, por favor dame tu perspectiva. Mi pregunta principal es: "${userFinalQuestion}".\n\n`;
-            questions.forEach((q, i) => { userPrompt += `Pregunta: ${q}\nRespuesta: ${answers[i] || 'No respondido'}\n\n`; });
-            const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
-            try {
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
-                const payload = { contents: [{ parts: [{ text: fullPrompt }] }], };
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) {
-                    const errorBody = await response.json().catch(() => ({ error: { message: response.statusText } }));
-                    console.error("API Error Response:", errorBody);
-                    throw new Error(`Error de API: ${response.status} - ${errorBody.error.message}`);
-                }
-                const result = await response.json();
-                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
-                if (text) {
-                    let htmlResponse = text.replace(/\n/g, '<br>');
-                    htmlResponse = htmlResponse.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                    responseContainer.innerHTML = htmlResponse;
-                } else {
-                     responseContainer.textContent = "No se pudo obtener una respuesta válida del asistente. Por favor, intenta de nuevo.";
-                }
-            } catch (error) {
-                console.error("Error fetching AI response:", error);
-                responseContainer.innerHTML = `<p class='text-red-500'>Ocurrió un error al contactar al asistente. Por favor, revisa tu conexión o intenta más tarde. (Detalle: ${error.message})</p>`;
-            }
-        };
-        
-        const resetAi = () => {
-            aiIntro.classList.remove('hidden');
-            aiTest.classList.add('hidden');
-            aiResult.classList.add('hidden');
-            document.getElementById('question-container').classList.remove('hidden');
-            userFinalQuestionContainer.classList.add('hidden');
-            userFinalQuestionInput.value = '';
-        };
-
-        startTestBtn.addEventListener('click', startTest);
-        nextQuestionBtn.addEventListener('click', nextQuestion);
-        prevQuestionBtn.addEventListener('click', prevQuestion);
-        getAiResponseBtn.addEventListener('click', getAiResponse);
-        aiResetBtn.addEventListener('click', resetAi);
-
-        // --- Initial Load ---
-        document.getElementById('loading-overlay').style.display = 'none';
-        loadData();
+    document.addEventListener('click',(e)=>{ 
+      const b=e.target.closest('button'); if(!b||!b.dataset.type) return; 
+      const t=b.dataset.type, i=Number(b.dataset.i);
+      const deleteActions = { 
+        'prop-del': { list: 'propiedades', render: renderPropiedades, msg: 'Propiedad eliminada' }, 'alq-del': { list: 'alquileres', render: renderAlquileres, msg: 'Alquiler eliminado' },
+        'ing-del': { list: 'ingresos', render: renderIngresos, msg: 'Ingreso eliminado' }, 'gas-del': { list: 'gastos', render: renderGastos, msg: 'Gasto eliminado' },
+        'serv-del': { list: 'servicios', render: renderServicios, msg: 'Servicio eliminado' }, 'link-del': { list: 'links', render: renderLinks, msg: 'Enlace eliminado' },
+        'receta-del': { list: 'recetas', render: renderRecetas, msg: 'Receta eliminada' }
+      };
+      if(deleteActions[t]){ const action = deleteActions[t]; state[action.list].splice(i,1); persist(); action.render(); renderResumen(); toast(action.msg); } 
+      else if(t==='prop-edit'){ startEditProp(i); }
+      else if (t === 'prop-dup') { const original = state.propiedades[i]; if(original){ const newProp = {...original, id: crypto.randomUUID(), nombre: original.nombre + ' - Copia'}; state.propiedades.splice(i + 1, 0, newProp); persist(); renderPropiedades(); startEditProp(i + 1); }}
+      else if(t==='receta-view'){ const r=state.recetas[i]; const content=`<h3>Ingredientes:</h3><pre>${r.ingredientes||'N/A'}</pre><h3>Instrucciones:</h3><pre>${r.instrucciones||'N/A'}</pre>`; openModal(r.nombre, content); }
     });
-    </script>
+
+    // ===== EXPORTAR/IMPORTAR =====
+    function exportData(){ const payload={ app:'JustPersonal', version:8, exportedAt:new Date().toISOString(), data:state }; const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='backup_justpersonal_'+toYM(new Date().toISOString())+'.json'; a.click(); URL.revokeObjectURL(a.href); toast('Datos exportados'); }
+    async function importData(file){ try{ const text=await file.text(); const obj=JSON.parse(text); if(!obj||!obj.app||!obj.data) throw new Error('Archivo inválido'); initState(); Object.keys(obj.data).forEach(key => { if(state.hasOwnProperty(key)) state[key] = obj.data[key]; }); persist(); renderAll(); toast('Importación completa'); }catch(e){ console.error(e); toast(e.message); } }
+    $('#btn-export').addEventListener('click', exportData); $('#btn-import').addEventListener('click',()=>$('#file-import').click()); $('#file-import').addEventListener('change',(e)=>{ if(e.target.files?.[0]) importData(e.target.files[0]); e.target.value=''; });
+
+    // ===== ASISTENTE VIRTUAL =====
+    const chat={ panel:$('#chat-panel'), body:$('#chat-body'), input:$('#chat-input') };
+    function pushMsg(html, me=false){ const d=document.createElement('div'); d.className='msg'+(me?' me':''); d.innerHTML=html; chat.body.append(d); chat.body.scrollTop=chat.body.scrollHeight; if(state.chat.length > 50)state.chat.shift(); state.chat.push({me,html,ts:Date.now()}); persist(); }
+    const toggleChat = (force) => chat.panel.classList.toggle('open', force);
+    $('#open-chat').addEventListener('click', () => toggleChat()); $('#btn-close-chat').addEventListener('click', () => toggleChat(false));
+    $('#btn-clear-chat').addEventListener('click', ()=>{ state.chat=[]; persist(); loadChatHistory(true); });
+    function showTyping() { const el = document.createElement('div'); el.className = 'msg typing'; el.id = 'typing-indicator'; el.textContent = 'Pensando...'; chat.body.appendChild(el); chat.body.scrollTop = chat.body.scrollHeight; }
+    function hideTyping() { const el = $('#typing-indicator'); if (el) el.remove(); }
+    
+    async function processAssistantQuery(query) {
+        showTyping();
+        const q = query.toLowerCase().trim();
+        const ym = toYM(new Date().toISOString());
+
+        // Primero, intentar responder con datos locales
+        let response = '';
+        if (q.includes('cuántas propiedades') || q.includes('numero de propiedades')) {
+            const count = state.propiedades.length;
+            response = `Tienes ${count} propiedades registradas.`;
+        } else if (q.includes('propiedades') && state.propiedades.length > 0) {
+            response = `Tienes ${state.propiedades.length} propiedades: <ul>` + state.propiedades.map(p => `<li>${p.nombre}</li>`).join('') + `</ul>`;
+        } else if (q.includes('ingreso total')) {
+            const total = state.ingresos.reduce((s, r) => s + Number(r.monto), 0) + state.alquileres.reduce((s, a) => s + Number(a.monto), 0);
+            response = `Tu ingreso total acumulado es de ${fmt(total)}.`;
+        } else if (q.includes('gasto total')) {
+            const total = state.gastos.reduce((s, r) => s + Number(r.monto), 0);
+            response = `Tu gasto total acumulado es de ${fmt(total)}.`;
+        } else if (q.includes('saldo')) {
+            const totalIngresos = state.ingresos.reduce((s, r) => s + Number(r.monto), 0) + state.alquileres.reduce((s, a) => s + Number(a.monto), 0);
+            const totalGastos = state.gastos.reduce((s, r) => s + Number(r.monto), 0);
+            response = `Tu saldo total acumulado (ingresos - gastos) es de ${fmt(totalIngresos - totalGastos)}.`;
+        } else if (q.includes('resumen')) {
+            const ingM = state.ingresos.filter(r=>toYM(r.fecha)===ym).reduce((s, r) => s + Number(r.monto), 0);
+            const alqM = state.alquileres.filter(a=>a.mes===ym).reduce((s, r) => s + Number(r.monto), 0);
+            const gasM = state.gastos.filter(r=>toYM(r.fecha)===ym).reduce((s, r) => s + Number(r.monto), 0);
+            response = `📊 Resumen para ${ym}:<br>Ingresos: ${fmt(ingM + alqM)}<br>Gastos: ${fmt(gasM)}<br><b>Saldo: ${fmt((ingM + alqM) - gasM)}</b>`;
+        }
+
+        if (response) {
+            hideTyping();
+            pushMsg(response);
+            return;
+        }
+
+        // Si no hay respuesta local, buscar en internet
+        await askInternet(query);
+    }
+
+    async function askInternet(q){ 
+        const stopWords = ['qué es', 'que es', 'dime', 'explica', 'háblame de', 'hablame de', 'define', 'buscar', 'busca', 'quien fue', 'quién fue', 'cuál es', 'cual es', 'buscar en internet'];
+        let searchTerm = q.toLowerCase().trim();
+        for (const word of stopWords) { if (searchTerm.startsWith(word + " ")) { searchTerm = searchTerm.substring(word.length).trim(); break; } }
+        
+        if (!searchTerm) { hideTyping(); pushMsg("Por favor, sé más específico."); return; }
+
+        try {
+            let answer, url, source = '';
+            let res = await fetch(API_CONFIG.duckDuckGo(searchTerm));
+            if(res.ok){ let data = await res.json(); answer = data.AbstractText || data.Answer; url = data.AbstractURL; source = 'DuckDuckGo'; }
+            
+            if (!answer) {
+                res = await fetch(API_CONFIG.wikipediaSearch(searchTerm));
+                if(res.ok){ let data = await res.json(); const pageTitle = data[1]?.[0];
+                if(pageTitle) {
+                    res = await fetch(API_CONFIG.wikipediaSummary(pageTitle));
+                    if(res.ok){ let sData = await res.json(); answer = sData.extract; url = sData.content_urls?.desktop?.page; source = 'Wikipedia'; }
+                }}
+            }
+            hideTyping();
+            if (answer) { let html = `<strong>Respuesta para "${q}":</strong><br><br>${answer.replace(/\n/g, '<br>')}`; if (url) html += `<a href="${url}" target="_blank" rel="noopener" class="source-link">🔗 Fuente: ${source}</a>`; pushMsg(html);
+            } else { pushMsg(`🤔 No encontré información en línea sobre "<strong>${q}</strong>".`); }
+        } catch(e){ hideTyping(); console.error(e); pushMsg('❌ <strong>Error de conexión.</strong>'); } 
+    }
+
+    async function sendChat(){ const v=(chat.input.value||'').trim(); if(!v) return; pushMsg(v,true); chat.input.value=''; await processAssistantQuery(v); }
+    $('#chat-send').addEventListener('click', sendChat); chat.input.addEventListener('keydown', (e) => { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendChat(); }});
+    $$('.chip').forEach(c => c.addEventListener('click',() => {
+        const query = c.dataset.chip;
+        processAssistantQuery(query);
+        pushMsg(query, true);
+    }));
+
+    function loadChatHistory(clearAndGreet = false) { 
+        chat.body.innerHTML = ''; 
+        if (clearAndGreet || !state.chat.length) { 
+            pushMsg('¡Hola! 👋 Soy tu asistente personal.<br><br>Puedes preguntarme sobre tus datos, por ejemplo:<br>- "¿Cuántas propiedades tengo?"<br>- "Resumen de finanzas"'); 
+        } else { 
+            state.chat.forEach(msg => { const d=document.createElement('div'); d.className='msg'+(msg.me?' me':''); d.innerHTML=msg.html; chat.body.append(d); }); 
+        } 
+        if(chat.body.scrollHeight > 0) chat.body.scrollTop=chat.body.scrollHeight; 
+    }
+    
+    // ===== INICIALIZACIÓN =====
+    function init() {
+        initState();
+        renderAll();
+        const today = new Date().toISOString().slice(0,10);
+        $('#res-mes').value = toYM(today); $('#alq-mes').value = toYM(today);
+        $('#ing-fecha').value = today; $('#gas-fecha').value = today; $('#fecha-salud').value = today;
+        $('#res-mes')?.addEventListener('change', renderResumen); 
+        $('#btn-refrescar-resumen')?.addEventListener('click', renderResumen);
+        loadChatHistory();
+    }
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
